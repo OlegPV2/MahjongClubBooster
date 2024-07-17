@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">Mahjong Club Booster</string>
+
+    <string name="app_restart_note">Необходимо предварительно выйти из игры</string>
+    <string name="daily_levels_patch_header">Генерация ежедневных игр для турнира</string>
+    <string name="daily_levels_patch_start">Начало</string>
+    <string name="daily_levels_patch_end">Конец</string>
+    <string name="daily_levels_button_text_patch">Создать ежедневки</string>
+    <string name="daily_levels_patch_dummy_date">%1$d-%2$d-%3$d</string>
+    <string name="daily_levels_button_text_backup">Резервная копия</string>
+    <string name="daily_levels_button_text_restore">Восстановить</string>
+
+    <string name="butterfly_header">Событие \"Бабочки\"</string>
+    <string name="butterfly_button_collect">Собрать призы</string>
+    <string name="butterfly_button_restore">Восстановить файл</string>
+
+    <string name="experience_header">Прокачка опыта</string>
+    <string name="experience_text">Текущий пройденый уровень</string>
+    <string name="experience_button">Создать следующий уровень</string>
+
+    <string name="dialog_storage_message">Для управления файлами требуются разрешения на доступ ко всем файлам на устройстве.</string>
+    <string name="dialog_need_uri_permission_message">Для возможности записи файлов в папку игры необходимо предоставить разрешение.\nДля предоставления доступа на следующем экране надо нажать кнопку \"Использовать этот каталог\" и подтвердить выбор.</string>
+    <string name="dialog_button_request_permission">Предоставить</string>
+    <string name="dialog_button_cancel">Отмена</string>
+    <string name="toast_permission_granted">Авторизация прошла успешно</string>
+    <string name="toast_permission_not_granted">Авторизация не удалась</string>
+
+    <string name="backup_folder_exist">Path %1$s exist</string>
+    <string name="backup_folder_make">Make dir: %1$s</string>
+</resources>
