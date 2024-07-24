@@ -9,11 +9,15 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.Settings;
+import android.util.Log;
 
 import com.oleg.mahjongclubbooster.App;
 import com.oleg.mahjongclubbooster.constant.RequestCode;
 
+import rikka.shizuku.Shizuku;
+
 public class PermissionTools {
+    private static final String SHIZUKU_PACKAGE_NAME = "moe.shizuku.privileged.api";
 
     public static boolean hasStoragePermission() {
         Context context = App.get();
@@ -35,4 +39,25 @@ public class PermissionTools {
         }
     }
 
+    private static boolean isShizukuInstalled() {
+        try {
+            App.get().getPackageManager().getPackageInfo(SHIZUKU_PACKAGE_NAME, 0);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e("isShizukuInstalled", e.toString());
+        }
+        return false;
+    }
+
+    public static boolean isShizukuAvailable() {
+        return isShizukuInstalled() && Shizuku.pingBinder();
+    }
+
+    public static boolean hasShizukuPermission() {
+        return Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public static void requestShizukuPermission() {
+        Shizuku.requestPermission(RequestCode.SHIZUKU);
+    }
 }

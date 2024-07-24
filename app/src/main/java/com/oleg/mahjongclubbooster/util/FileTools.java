@@ -15,22 +15,42 @@ import androidx.documentfile.provider.DocumentFile;
 import com.oleg.mahjongclubbooster.App;
 import com.oleg.mahjongclubbooster.constant.PathType;
 import com.oleg.mahjongclubbooster.constant.RequestCode;
+import com.oleg.mahjongclubbooster.userservice.IFileExplorerService;
 
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 public class FileTools {
-    public static final String ROOT_PATH = Environment.getExternalStorageDirectory().getPath();
-    public static final String dataPath = FileTools.ROOT_PATH + "/Android/data/";
-    public static final String mahjongClubFilesPath = FileTools.ROOT_PATH + "/Android/data/com.gamovation.mahjongclub/files/";
+    public static String ROOT_PATH;
+//            "/storage/0110-0030/";
+    public static String dataPath;
+    public static String mahjongClubFilesPath;
+    public static int specialPathReadType = PathType.DOCUMENT;
+    public static IFileExplorerService iFileExplorerService;
+
+    public static void defineRootPath(Context context) {
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.N &&
+                android.os.Build.DEVICE.contains("Huawei") || android.os.Build.MANUFACTURER.contains("Huawei")) {
+	        ArrayList<File> extStorages = new ArrayList<>(Arrays.asList(context.getExternalFilesDirs(null)));
+            ROOT_PATH = extStorages.get(1).getPath().split("/Android")[0];
+        } else {
+            ROOT_PATH = Environment.getExternalStorageDirectory().getPath();
+        }
+        dataPath = FileTools.ROOT_PATH + "/Android/data/";
+        mahjongClubFilesPath = FileTools.ROOT_PATH + "/Android/data/com.gamovation.mahjongclub/files/";
+    }
 
     public static boolean shouldRequestUriPermission(String path) {
+/*
         if (getPathType(path) != PathType.DOCUMENT) {
             return false;
         }
+*/
         return !hasUriPermission(path);
     }
 
@@ -68,7 +88,7 @@ public class FileTools {
                 Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
 	    Uri treeUri = pathToUri(path);
 	    DocumentFile df = DocumentFile.fromTreeUri(activity, treeUri);
-	    if (df != null) {
+	    if (df != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 	        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, df.getUri());
 	    }
 	    activity.startActivityForResult(intent, RequestCode.DOCUMENT);

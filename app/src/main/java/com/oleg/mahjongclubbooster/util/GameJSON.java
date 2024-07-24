@@ -8,14 +8,14 @@ import android.util.Log;
 import androidx.documentfile.provider.DocumentFile;
 
 import com.oleg.mahjongclubbooster.App;
-import com.oleg.mahjongclubbooster.interfaces.ProcessCallbackInterface;
+import com.oleg.mahjongclubbooster.constant.PathType;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,16 +23,13 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 
 public class GameJSON {
 
 	private static String loadExternalJSON(Context context, String path, String file) {
 		String jString = null;
-		Uri pathUri = FileTools.pathToUri(path);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && FileTools.specialPathReadType != PathType.SHIZUKU) {
+			Uri pathUri = FileTools.pathToUri(path);
 			DocumentFile documentPath = DocumentFile.fromTreeUri(App.get(), pathUri);
 			if (documentPath != null) {
 				DocumentFile df = documentPath.findFile(file);
@@ -60,16 +57,16 @@ public class GameJSON {
 
 					jString = Charset.defaultCharset().decode(bb).toString();
 				} catch (Exception e) {
-					e.printStackTrace();
+					Log.e("loadExternalJSON", e.toString());
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				Log.e("loadExternalJSON", e.toString());
 			}		}
 		return jString;
 	}
 
 	private static String loadJSONFromAsset(Context context, String file) {
-		String jString = null;
+		String jString;
 		try {
 			InputStream is = context.getAssets().open(file);
 			int size = is.available();
@@ -85,23 +82,42 @@ public class GameJSON {
 	}
 
 	private static Boolean saveToFile(Context context, String path, String file, byte[] data) {
-		Uri pathUri = FileTools.pathToUri(path);
-		DocumentFile documentPath = DocumentFile.fromTreeUri(App.get(), pathUri);
-		if (documentPath != null) {
-			DocumentFile df = documentPath.findFile(file);
-			if (df == null)
-				df = documentPath.createFile("application/*", file);
-			try {
-				assert df != null;
-				OutputStream os = context.getContentResolver().openOutputStream(df.getUri());
-				if (os != null) {
-					os.write(data);
-					os.close();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+			Uri pathUri = FileTools.pathToUri(path);
+			DocumentFile documentPath = DocumentFile.fromTreeUri(App.get(), pathUri);
+			if (documentPath != null) {
+				DocumentFile df = documentPath.findFile(file);
+				if (df != null) {
+					df.delete();
 				}
-				return true;
-			} catch (IOException e) {
-				Log.e("saveToFileByte", String.valueOf(e));
-				return false;
+				df = documentPath.createFile("application/*", file);
+				try {
+					assert df != null;
+					OutputStream os = context.getContentResolver().openOutputStream(df.getUri());
+					if (os != null) {
+						os.write(data);
+						os.close();
+					}
+					return true;
+				} catch (IOException e) {
+					Log.e("saveToFile", String.valueOf(e));
+					return false;
+				}
+			}
+		} else {
+			try {
+				File fileToSave = new File(path, file);
+				if (fileToSave.exists()) {
+					fileToSave.delete();
+				}
+				if (fileToSave.createNewFile()) {
+					FileOutputStream fileOutputStream = new FileOutputStream(fileToSave);
+					fileOutputStream.write(data);
+					fileOutputStream.close();
+					return true;
+				}
+			} catch (Exception e) {
+				Log.e("saveToFile", e.toString());
 			}
 		}
 		return false;
@@ -110,7 +126,7 @@ public class GameJSON {
 	public static String currentLevel(Context context) {
 		try {
 			JSONObject names = new JSONObject(loadExternalJSON(context, FileTools.mahjongClubFilesPath, "playerProfile.json"));
-			return names.getString("levelsCompleted");
+			return String.valueOf((Integer.parseInt(names.getString("levelsCompleted")) + 1));
 		} catch (JSONException e) {
 			Log.e("JSON_CurrentLevel", String.valueOf(e));
 		}

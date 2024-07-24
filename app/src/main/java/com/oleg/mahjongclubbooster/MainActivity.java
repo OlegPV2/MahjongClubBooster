@@ -1,5 +1,7 @@
 package com.oleg.mahjongclubbooster;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -7,7 +9,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -15,16 +19,19 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.oleg.mahjongclubbooster.autoclick.TapAccessibilityService;
+import com.oleg.mahjongclubbooster.constant.PathType;
 import com.oleg.mahjongclubbooster.constant.RequestCode;
-import com.oleg.mahjongclubbooster.interfaces.ProcessCallbackInterface;
+import com.oleg.mahjongclubbooster.update.CheckUpdate;
+import com.oleg.mahjongclubbooster.userservice.FileExplorerServiceManager;
 import com.oleg.mahjongclubbooster.util.FileTools;
-import com.oleg.mahjongclubbooster.util.GameJSON;
 import com.oleg.mahjongclubbooster.util.PermissionTools;
+import com.oleg.mahjongclubbooster.util.SPUtils;
 import com.oleg.mahjongclubbooster.util.ToastUtils;
 
-public class MainActivity extends AppCompatActivity {
+import rikka.shizuku.Shizuku;
 
-	ProcessCallbackInterface buttonText = null;
+public class MainActivity extends AppCompatActivity implements Shizuku.OnRequestPermissionResultListener {
 
 	private static final String TAG = "Overlay";
 
@@ -32,7 +39,21 @@ public class MainActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		CheckUpdate.checkUpdate(this);
+		FileTools.defineRootPath(this);
+		if (PermissionTools.isShizukuAvailable()) {
+			Shizuku.addRequestPermissionResultListener(this);
+		}
 		checkAllPermissions();
+	}
+
+	@Override
+	protected void onDestroy() {
+		stopService(new Intent(this, OverlayService.class));
+		if (PermissionTools.isShizukuAvailable()) {
+			Shizuku.removeRequestPermissionResultListener(this);
+		}
+		super.onDestroy();
 	}
 
 	private void checkAllPermissions() {
@@ -40,8 +61,18 @@ public class MainActivity extends AppCompatActivity {
 		if (checkDrawOverlayPermission()) {
 			startOverlayService();
 		}
+		if(!isAccessibilityServiceEnabled(this, TapAccessibilityService.class)){
+			Toast.makeText(MainActivity.this, "please enable accessibility service", Toast.LENGTH_SHORT).show();
+			Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			startActivity(intent);
+		}
 		// Check storage permission
-		if (!PermissionTools.hasStoragePermission()) {
+		if (PermissionTools.hasStoragePermission()) {
+			if (!SPUtils.getUseNewDocument()) {
+				checkShizukuPermission();
+			}
+		} else {
 			showStoragePermissionDialog();
 		}
 	}
@@ -58,6 +89,27 @@ public class MainActivity extends AppCompatActivity {
 			return false;
 		}
 		return true;
+	}
+
+	public static boolean isAccessibilityServiceEnabled(Context context, Class<?> accessibilityService) {
+		ComponentName expectedComponentName = new ComponentName(context, accessibilityService);
+
+		String enabledServicesSetting = Settings.Secure.getString(context.getContentResolver(),  Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+		if (enabledServicesSetting == null)
+			return false;
+
+		TextUtils.SimpleStringSplitter colonSplitter = new TextUtils.SimpleStringSplitter(':');
+		colonSplitter.setString(enabledServicesSetting);
+
+		while (colonSplitter.hasNext()) {
+			String componentNameString = colonSplitter.next();
+			ComponentName enabledService = ComponentName.unflattenFromString(componentNameString);
+
+			if (enabledService != null && enabledService.equals(expectedComponentName))
+				return true;
+		}
+
+		return false;
 	}
 
 	private void startOverlayService() {
@@ -79,21 +131,18 @@ public class MainActivity extends AppCompatActivity {
 		new AlertDialog.Builder(this)
 				.setCancelable(false)
 				.setMessage(R.string.dialog_storage_message)
-				.setPositiveButton(R.string.dialog_button_request_permission, (dialog, which) -> {
-					PermissionTools.requestStoragePermission(this);
-				})
-				.setNegativeButton(R.string.dialog_button_cancel, (dialog, which) -> {
-					finish();
-				}).create().show();
+				.setPositiveButton(R.string.dialog_button_request_permission, (dialog, which) ->
+						PermissionTools.requestStoragePermission(this))
+				.setNegativeButton(R.string.dialog_button_cancel, (dialog, which) ->
+						finish()).create().show();
 	}
 
 	private void showRequestUriPermissionDialog() {
 		new AlertDialog.Builder(this)
 				.setCancelable(false)
 				.setMessage(R.string.dialog_need_uri_permission_message)
-				.setPositiveButton(R.string.dialog_button_request_permission, (dialog, which) -> {
-					FileTools.requestUriPermission(this, FileTools.dataPath);
-				})
+				.setPositiveButton(R.string.dialog_button_request_permission, (dialog, which) ->
+						FileTools.requestUriPermission(this, FileTools.dataPath))
 				.setNegativeButton(R.string.dialog_button_cancel, (dialog, which) -> {
 				}).create().show();
 	}
@@ -124,9 +173,23 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
+	private void checkShizukuPermission() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+			if (PermissionTools.isShizukuAvailable()) {
+				if (PermissionTools.hasShizukuPermission()) {
+					FileTools.specialPathReadType = PathType.SHIZUKU;
+					FileExplorerServiceManager.bindService();
+				} else {
+					PermissionTools.requestShizukuPermission();
+				}
+			}
+		}
+	}
+
 	protected void onStoragePermissionResult(boolean granted) {
 		if (granted) {
 			ToastUtils.shortCall(R.string.toast_permission_granted);
+			checkShizukuPermission();
 			if (FileTools.shouldRequestUriPermission(FileTools.dataPath)) {
 				showRequestUriPermissionDialog();
 			}
@@ -139,9 +202,18 @@ public class MainActivity extends AppCompatActivity {
 	protected void onDocumentPermissionResult(boolean granted) {
 		if (granted) {
 			ToastUtils.shortCall(R.string.toast_permission_granted);
-			buttonText.updateButtonText(GameJSON.currentLevel(this));
 		} else {
 			ToastUtils.shortCall(R.string.toast_permission_not_granted);
+		}
+	}
+
+	@Override
+	public void onRequestPermissionResult(int requestCode, int grantResult) {
+		if (requestCode == RequestCode.SHIZUKU) {
+			if (grantResult == PackageManager.PERMISSION_GRANTED) {
+				FileTools.specialPathReadType = PathType.SHIZUKU;
+				FileExplorerServiceManager.bindService();
+			}
 		}
 	}
 }

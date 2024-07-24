@@ -2,9 +2,6 @@ package com.oleg.mahjongclubbooster;
 
 import android.app.Application;
 
-import java.io.File;
-import java.io.FileOutputStream;
-
 public class App extends Application {
     private static App sApp;
 
