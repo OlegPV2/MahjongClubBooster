@@ -155,6 +155,7 @@ public class OverlayService extends Service {
 				Intent intentAutoclick = new Intent(App.get(), TapAccessibilityService.class);
 				intentAutoclick.putExtra(TapAccessibilityService.ACTION, TapAccessibilityService.STOP);
 				startService(intentAutoclick);
+				button.setBackgroundColor(R.drawable.round_button);
 				autoclickEnabled = false;
 				ToastUtils.shortCall(R.string.autoclick_disabled);
 			} else {
@@ -190,6 +191,7 @@ public class OverlayService extends Service {
 		popup.setOnItemClickListener((arg0, view, position, id3) -> {
 			updateButtonText();
 			GameJSON.currentLevelStatusPatch(App.get());
+			button.setBackgroundColor(R.drawable.round_button_green);
 			Intent intent = new Intent(App.get(), TapAccessibilityService.class);
 			intent.putExtra(TapAccessibilityService.ACTION, TapAccessibilityService.PLAY);
 			intent.putExtra("interval", 10000);
