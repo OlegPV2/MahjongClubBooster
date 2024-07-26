@@ -18,6 +18,7 @@
     <string name="experience_text">Текущий пройденый уровень</string>
     <string name="experience_button">Создать следующий уровень</string>
 
+    <string name="dialog_accessibility_message">Для работы автокликера на кнопке необходимо разрешение на полное управление устройством.\nНа следующем экране необходимо найти в списке приложение <b>Mahjong Club Tap Service</b> и выдать разрешение.\n\nВ случае, если приложение в списке недоступно, надо зайти в Настройки -> Приложения -> Mahjong Club Booster. В правом верхнем углу нажать три точки и Разрешить доступ к настройкам. После этого перезапускить приложение</string>
     <string name="dialog_storage_message">Для управления файлами требуются разрешения на доступ ко всем файлам на устройстве.</string>
     <string name="dialog_need_uri_permission_message">Для возможности записи файлов в папку игры необходимо предоставить разрешение.\nДля предоставления доступа на следующем экране надо нажать кнопку \"Использовать этот каталог\" и подтвердить выбор.</string>
     <string name="dialog_button_request_permission">Предоставить</string>
@@ -28,6 +29,8 @@
     <string name="toast_shizuku_connected">Сервис Shizuku подключен</string>
     <string name="toast_shizuku_disconnected">Сервис Shizuku отключен</string>
     <string name="toast_shizuku_load_file_failed">Не удалось получить доступ, пожалуйста, повторно авторизуйте Shizuku!</string>
+
+    <string name="button_default_text">Начать</string>
 
     <string name="popupmenu_item1">Автоклик на 10 с</string>
 

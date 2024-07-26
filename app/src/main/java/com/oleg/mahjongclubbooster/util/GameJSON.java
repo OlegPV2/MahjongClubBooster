@@ -124,22 +124,26 @@ public class GameJSON {
 	}
 
 	public static String currentLevel(Context context) {
-		try {
-			JSONObject names = new JSONObject(loadExternalJSON(context, FileTools.mahjongClubFilesPath, "playerProfile.json"));
-			return String.valueOf((Integer.parseInt(names.getString("levelsCompleted")) + 1));
-		} catch (JSONException e) {
-			Log.e("JSON_CurrentLevel", String.valueOf(e));
+		if (!FileTools.shouldRequestUriPermission(FileTools.dataPath)) {
+			try {
+				JSONObject names = new JSONObject(loadExternalJSON(context, FileTools.mahjongClubFilesPath, "playerProfile.json"));
+				return String.valueOf((Integer.parseInt(names.getString("levelsCompleted")) + 1));
+			} catch (JSONException e) {
+				Log.e("JSON_CurrentLevel", String.valueOf(e));
+			}
 		}
-		return "";
+		return "N/A";
 	}
 
 	public static void currentLevelStatusPatch(Context context) {
-		try {
-			JSONObject dummy = new JSONObject(loadJSONFromAsset(context, "dummy.json"));
-			dummy.put("levelIndex", currentLevel(context));
-			saveToFile(context, FileTools.mahjongClubFilesPath, "CurrentLevelStatus", dummy.toString().getBytes());
-		} catch (JSONException e) {
-			Log.e("JSON_CurrentLevelStatus", String.valueOf(e));
+		if (!FileTools.shouldRequestUriPermission(FileTools.dataPath)) {
+			try {
+				JSONObject dummy = new JSONObject(loadJSONFromAsset(context, "dummy.json"));
+				dummy.put("levelIndex", currentLevel(context));
+				saveToFile(context, FileTools.mahjongClubFilesPath, "CurrentLevelStatus", dummy.toString().getBytes());
+			} catch (JSONException e) {
+				Log.e("JSON_CurrentLevelStatus", String.valueOf(e));
+			}
 		}
 	}
 

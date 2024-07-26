@@ -8,6 +8,8 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.view.accessibility.AccessibilityEvent;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.oleg.mahjongclubbooster.App;
 import com.oleg.mahjongclubbooster.OverlayService;
 import com.oleg.mahjongclubbooster.R;
@@ -63,6 +65,7 @@ public class TapAccessibilityService extends AccessibilityService {
 	}
 
 	private void tap(int x, int y) {
+		GameJSON.currentLevelStatusPatch(App.get());
 		Path swipePath = new Path();
 		swipePath.moveTo(x, y);
 		swipePath.lineTo(x, y);
@@ -72,8 +75,8 @@ public class TapAccessibilityService extends AccessibilityService {
 			@Override
 			public void onCompleted(GestureDescription gestureDescription) {
 				super.onCompleted(gestureDescription);
-				OverlayService.updateButtonText();
-				GameJSON.currentLevelStatusPatch(App.get());
+				sendUpdateTextToButton(GameJSON.currentLevel(App.get()));
+//				OverlayService.updateButtonText();
 				mHandler.postDelayed(myRunnable, mInterval);
 			}
 
@@ -92,6 +95,12 @@ public class TapAccessibilityService extends AccessibilityService {
 		public void run() {
 			tap(mX, mY);
 		}
+	}
+
+	private void sendUpdateTextToButton (String text) {
+		Intent intent = new Intent(OverlayService.ACTION_BROADCAST);
+		intent.putExtra(OverlayService.UPDATE_TEXT, text);
+		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 	}
 
 }

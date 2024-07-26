@@ -60,4 +60,10 @@ public class PermissionTools {
     public static void requestShizukuPermission() {
         Shizuku.requestPermission(RequestCode.SHIZUKU);
     }
+
+    public static void requestAccessibilityPermission(Activity activity) {
+        Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        activity.startActivity(intent);
+    }
 }

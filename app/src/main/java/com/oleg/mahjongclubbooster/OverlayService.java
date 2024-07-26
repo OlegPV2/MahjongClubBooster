@@ -5,12 +5,13 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.os.Build;
-import android.os.FileObserver;
 import android.os.IBinder;
 import android.view.Display;
 import android.view.Gravity;
@@ -21,14 +22,12 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.SimpleAdapter;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.ListPopupWindow;
 import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.oleg.mahjongclubbooster.autoclick.TapAccessibilityService;
-import com.oleg.mahjongclubbooster.util.FileTools;
 import com.oleg.mahjongclubbooster.util.GameJSON;
-import com.oleg.mahjongclubbooster.util.PermissionTools;
 import com.oleg.mahjongclubbooster.util.ToastUtils;
 
 import java.util.ArrayList;
@@ -36,9 +35,11 @@ import java.util.HashMap;
 import java.util.List;
 
 public class OverlayService extends Service {
+	public static final String UPDATE_TEXT = "button_text";
+	public static final String ACTION_BROADCAST = "textBroadcast";
 	private static final String TITLE = "Autoclick";
 	private WindowManager windowManager;
-	private static Button button;
+	private Button button;
 	private boolean autoclickEnabled = false;
 
 	long lastPressTime;
@@ -61,7 +62,7 @@ public class OverlayService extends Service {
 					.createNotificationChannel(channel);
 
 			Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-					.setContentTitle("adsf")
+					.setContentTitle("Mahjong Club Booster")
 					.setContentText("asdf1")
 					.setSmallIcon(R.mipmap.ic_launcher)
 					.build();
@@ -89,8 +90,17 @@ public class OverlayService extends Service {
 		button = new Button(this);
 		button.setBackgroundResource(R.drawable.round_button);
 		button.setTextSize(25);
-		button.setText("Button");
-		button.setAlpha(1);
+		button.setText(R.string.button_default_text);
+
+		LocalBroadcastManager.getInstance(this).registerReceiver(
+				new BroadcastReceiver() {
+					@Override
+					public void onReceive(Context context, Intent intent) {
+						String text = intent.getStringExtra(UPDATE_TEXT);
+						button.setText(text);
+					}
+				}, new IntentFilter(ACTION_BROADCAST)
+		);
 
 		params.gravity = Gravity.TOP | Gravity.START;
 		params.x = 0;
@@ -98,17 +108,17 @@ public class OverlayService extends Service {
 
 		windowManager.addView(button, params);
 
-		if (PermissionTools.hasStoragePermission()) {
+/*		if (PermissionTools.hasStoragePermission()) {
 			FileObserver observerPlayerProfile = new FileObserver(FileTools.mahjongClubFilesPath + "playerProfile.json") {
 				@Override
 				public void onEvent(int event, @Nullable String s) {
 					if (event == FileObserver.MODIFY) {
-						updateButtonText();
+						button.setText(GameJSON.currentLevel(App.get()));
 					}
 				}
 			};
 			observerPlayerProfile.startWatching();
-		}
+		}*/
 
 		button.setOnTouchListener(new View.OnTouchListener() {
 			private final WindowManager.LayoutParams paramsF = params;
@@ -155,15 +165,15 @@ public class OverlayService extends Service {
 				Intent intentAutoclick = new Intent(App.get(), TapAccessibilityService.class);
 				intentAutoclick.putExtra(TapAccessibilityService.ACTION, TapAccessibilityService.STOP);
 				startService(intentAutoclick);
-				button.setBackgroundColor(R.drawable.round_button);
+				button.setBackgroundResource(R.drawable.round_button);
 				autoclickEnabled = false;
 				ToastUtils.shortCall(R.string.autoclick_disabled);
 			} else {
-				updateButtonText();
+				button.setText(GameJSON.currentLevel(App.get()));
 				GameJSON.currentLevelStatusPatch(this);
 			}
 		});
-		updateButtonText();
+		button.setText(GameJSON.currentLevel(App.get()));
 
 		return START_STICKY;
 	}
@@ -189,9 +199,9 @@ public class OverlayService extends Service {
 		popup.setWidth(p.x / (2));
 		popup.setAdapter(adapter);
 		popup.setOnItemClickListener((arg0, view, position, id3) -> {
-			updateButtonText();
+			button.setText(GameJSON.currentLevel(App.get()));
 			GameJSON.currentLevelStatusPatch(App.get());
-			button.setBackgroundColor(R.drawable.round_button_green);
+			button.setBackgroundResource(R.drawable.round_button_green);
 			Intent intent = new Intent(App.get(), TapAccessibilityService.class);
 			intent.putExtra(TapAccessibilityService.ACTION, TapAccessibilityService.PLAY);
 			intent.putExtra("interval", 10000);
@@ -221,12 +231,6 @@ public class OverlayService extends Service {
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
-	}
-
-	public static void updateButtonText() {
-		if (PermissionTools.hasStoragePermission()) {
-			button.setText(GameJSON.currentLevel(App.get()));
-		}
 	}
 
 }
