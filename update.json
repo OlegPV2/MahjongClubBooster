@@ -1,7 +1,7 @@
 {
   "url":"https://github.com/OlegPV2/MahjongClubBooster/releases/download/Booster/",
   "fileName":"MahjongClubBooster.apk",
-  "versionCode":2,
+  "versionCode":1,
 "_comment":"do not forget to change versionCode in build.gradle before generating apk",
   "cancellable":true,
   "updateMessage":"Version 2.0\n-----------\nДобавлена функция автокликера. В связи с этим запрашивается еще одно разрешение."
