@@ -9,8 +9,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.IBinder;
 import android.view.Display;
@@ -18,9 +20,8 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListAdapter;
-import android.widget.SimpleAdapter;
 
 import androidx.appcompat.widget.ListPopupWindow;
 import androidx.core.app.NotificationCompat;
@@ -28,16 +29,11 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.oleg.mahjongclubbooster.autoclick.TapAccessibilityService;
 import com.oleg.mahjongclubbooster.util.GameJSON;
-import com.oleg.mahjongclubbooster.util.ToastUtils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class OverlayService extends Service {
 	public static final String UPDATE_TEXT = "button_text";
 	public static final String ACTION_BROADCAST = "textBroadcast";
-	private static final String TITLE = "Autoclick";
+
 	private WindowManager windowManager;
 	private Button button;
 	private boolean autoclickEnabled = false;
@@ -63,7 +59,7 @@ public class OverlayService extends Service {
 
 			Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
 					.setContentTitle("Mahjong Club Booster")
-					.setContentText("asdf1")
+					.setContentText("Foreground process")
 					.setSmallIcon(R.mipmap.ic_launcher)
 					.build();
 
@@ -135,7 +131,6 @@ public class OverlayService extends Service {
 
 						// If double click...
 						if (pressTime - lastPressTime <= 500) {
-							createNotification();
 							initiatePopupWindow(v);
 							mHasDoubleClicked = true;
 						} else {     // If not double click....
@@ -167,10 +162,11 @@ public class OverlayService extends Service {
 				startService(intentAutoclick);
 				button.setBackgroundResource(R.drawable.round_button);
 				autoclickEnabled = false;
-				ToastUtils.shortCall(R.string.autoclick_disabled);
+//				ToastUtils.shortCall(R.string.autoclick_disabled);
 			} else {
-				button.setText(GameJSON.currentLevel(App.get()));
-				GameJSON.currentLevelStatusPatch(this);
+				String level = GameJSON.currentLevel(App.get());
+				button.setText(level);
+				GameJSON.currentLevelStatusPatch(this, level);
 			}
 		});
 		button.setText(GameJSON.currentLevel(App.get()));
@@ -178,45 +174,54 @@ public class OverlayService extends Service {
 		return START_STICKY;
 	}
 
-	private void initiatePopupWindow(View anchor) {
-		List<HashMap<String, Object>> data = new ArrayList<>();
-		HashMap<String, Object> map = new HashMap<>();
-		map.put(TITLE, getString(R.string.popupmenu_item1));
-		data.add(map);
-
-		Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-		ListPopupWindow popup = new ListPopupWindow(this);
-		ListAdapter adapter = new SimpleAdapter(
-				this,
-				data,
-				R.layout.row,
-				new String[]{TITLE}, // These are just the keys that the data uses (constant strings)
-				new int[]{R.id.textView1}); // The view ids to map the data to
-
-		popup.setAnchorView(anchor);
-		Point p = new Point();
-		display.getSize(p);
-		popup.setWidth(p.x / (2));
-		popup.setAdapter(adapter);
-		popup.setOnItemClickListener((arg0, view, position, id3) -> {
-			button.setText(GameJSON.currentLevel(App.get()));
-			GameJSON.currentLevelStatusPatch(App.get());
-			button.setBackgroundResource(R.drawable.round_button_green);
-			Intent intent = new Intent(App.get(), TapAccessibilityService.class);
-			intent.putExtra(TapAccessibilityService.ACTION, TapAccessibilityService.PLAY);
-			intent.putExtra("interval", 10000);
-			int[] location = new int[2];
-			view.getLocationOnScreen(location);
-			intent.putExtra("x", location[0] - 1);
-			intent.putExtra("y", location[1] - 1);
-			startService(intent);
-			autoclickEnabled = true;
-			popup.dismiss();
-		});
-		popup.show();
+	private int measureContentWidth(String[] listAdapter) {
+		int maxWidth = 0;
+		Paint p = new Paint();
+		Rect bounds = new Rect();
+		for (String s : listAdapter) {
+			p.getTextBounds(s, 0, s.length(), bounds);
+			maxWidth = Math.max(bounds.width(), maxWidth);
+		}
+		return maxWidth;
 	}
 
-	public void createNotification() {
+	private void initiatePopupWindow(View anchor) {
+		String[] menu = new String[]{
+				getString(R.string.popupmenu_item1),
+				getString(R.string.popupmenu_item2)
+		};
+		Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+		ListPopupWindow listPopupWindow = new ListPopupWindow(this);
+		listPopupWindow.setAnchorView(anchor);
+		ArrayAdapter<String> adapter = new ArrayAdapter<>(getBaseContext(), R.layout.popup_menu_item, menu);
+		Point p = new Point();
+		display.getSize(p);
+		listPopupWindow.setWidth(measureContentWidth(menu) * 2);
+		listPopupWindow.setAdapter(adapter);
+		listPopupWindow.setModal(true);
+		listPopupWindow.setOnItemClickListener((arg0, view, position, id3) -> {
+			if (position == 0) {
+				String level = GameJSON.currentLevel(App.get());
+				button.setText(level);
+				GameJSON.currentLevelStatusPatch(App.get(), level);
+				button.setBackgroundResource(R.drawable.round_button_green);
+				Intent intent = new Intent(App.get(), TapAccessibilityService.class);
+				intent.putExtra(TapAccessibilityService.ACTION, TapAccessibilityService.PLAY);
+				intent.putExtra("interval", 10000);
+				int[] location = new int[2];
+				view.getLocationOnScreen(location);
+				intent.putExtra("x", location[0] - 1);
+				intent.putExtra("y", location[1] - 1);
+				startService(intent);
+				autoclickEnabled = true;
+			} else if (position == 1) {
+				String level = GameJSON.currentLevel(App.get());
+				button.setText(level);
+				GameJSON.currentLevelStatusPuzzlesPatch(App.get(), level);
+			}
+			listPopupWindow.dismiss();
+		});
+		listPopupWindow.show();
 	}
 
 	@Override

@@ -65,7 +65,8 @@ public class TapAccessibilityService extends AccessibilityService {
 	}
 
 	private void tap(int x, int y) {
-		GameJSON.currentLevelStatusPatch(App.get());
+		String level = GameJSON.currentLevel(App.get());
+		GameJSON.currentLevelStatusPatch(App.get(), level);
 		Path swipePath = new Path();
 		swipePath.moveTo(x, y);
 		swipePath.lineTo(x, y);
@@ -75,8 +76,7 @@ public class TapAccessibilityService extends AccessibilityService {
 			@Override
 			public void onCompleted(GestureDescription gestureDescription) {
 				super.onCompleted(gestureDescription);
-				sendUpdateTextToButton(GameJSON.currentLevel(App.get()));
-//				OverlayService.updateButtonText();
+				sendUpdateTextToButton(level);//GameJSON.currentLevel(App.get()));
 				mHandler.postDelayed(myRunnable, mInterval);
 			}
 

@@ -15,11 +15,17 @@ import androidx.documentfile.provider.DocumentFile;
 import com.oleg.mahjongclubbooster.App;
 import com.oleg.mahjongclubbooster.constant.PathType;
 import com.oleg.mahjongclubbooster.constant.RequestCode;
-import com.oleg.mahjongclubbooster.userservice.IFileExplorerService;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,8 +36,8 @@ public class FileTools {
 //            "/storage/0110-0030/";
     public static String dataPath;
     public static String mahjongClubFilesPath;
+    public static String localPath;
     public static int specialPathReadType = PathType.DOCUMENT;
-    public static IFileExplorerService iFileExplorerService;
 
     public static void defineRootPath(Context context) {
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.N &&
@@ -42,15 +48,14 @@ public class FileTools {
             ROOT_PATH = Environment.getExternalStorageDirectory().getPath();
         }
         dataPath = FileTools.ROOT_PATH + "/Android/data/";
-        mahjongClubFilesPath = FileTools.ROOT_PATH + "/Android/data/com.gamovation.mahjongclub/files/";
+        localPath = Objects.requireNonNull(context.getExternalFilesDir(null)).getAbsolutePath() + "/";
+        mahjongClubFilesPath = FileTools.dataPath + "com.gamovation.mahjongclub/files/";
     }
 
     public static boolean shouldRequestUriPermission(String path) {
-/*
         if (getPathType(path) != PathType.DOCUMENT) {
             return false;
         }
-*/
         return !hasUriPermission(path);
     }
 
@@ -113,6 +118,85 @@ public class FileTools {
             uriBuilder.appendPath("primary:" + halfPath);
         }
         return uriBuilder.build();
+    }
+
+    public static String readDocumentFile(Context context, String path, String file) {
+        Uri pathUri = FileTools.pathToUri(path);
+        DocumentFile documentPath = DocumentFile.fromTreeUri(App.get(), pathUri);
+        if (documentPath != null) {
+            DocumentFile df = documentPath.findFile(file);
+            try {
+                assert df != null;
+                InputStream is = context.getContentResolver().openInputStream(df.getUri());
+                if (is != null) {
+                    int size = is.available();
+                    byte[] buffer = new byte[size];
+                    is.read(buffer);
+                    is.close();
+                    return new String(buffer, StandardCharsets.UTF_8);
+                }
+            } catch (IOException e) {
+                Log.e("readDocumentFile", String.valueOf(e));
+                return "";
+            }
+        }
+        return "";
+    }
+
+    public static String readFile(String path, String file) {
+        try {
+            File yourFile = new File(path, file);
+            try (FileInputStream stream = new FileInputStream(yourFile)) {
+                FileChannel fc = stream.getChannel();
+                MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+
+                return Charset.defaultCharset().decode(bb).toString();
+            } catch (Exception e) {
+                Log.e("readFile", e.toString());
+            }
+        } catch (Exception e) {
+            Log.e("readFile", e.toString());
+            return "";
+        }
+        return "";
+    }
+
+    public static void saveDocumentFile(Context context, String path, String file, byte[] data){
+        Uri pathUri = FileTools.pathToUri(path);
+        DocumentFile documentPath = DocumentFile.fromTreeUri(App.get(), pathUri);
+        if (documentPath != null) {
+            DocumentFile df = documentPath.findFile(file);
+            if (df != null) {
+                df.delete();
+            }
+            df = documentPath.createFile("application/*", file);
+            try {
+                assert df != null;
+                OutputStream os = context.getContentResolver().openOutputStream(df.getUri());
+                if (os != null) {
+                    os.write(data);
+                    os.close();
+                }
+            } catch (IOException e) {
+                Log.e("saveDocumentFile", String.valueOf(e));
+            }
+        }
+    }
+
+    public static void saveFile(String path, String file, byte[] data) {
+        try {
+            File fileToSave = new File(path, file);
+            if (fileToSave.exists()) {
+                fileToSave.delete();
+            }
+            if (fileToSave.createNewFile()) {
+                FileOutputStream fileOutputStream = new FileOutputStream(fileToSave);
+                fileOutputStream.write(data);
+                fileOutputStream.close();
+            }
+        } catch (Exception e) {
+            Log.e("saveFile", e.toString());
+        }
     }
 
     public static void cleanDailyChallengeLevelsStatus() {

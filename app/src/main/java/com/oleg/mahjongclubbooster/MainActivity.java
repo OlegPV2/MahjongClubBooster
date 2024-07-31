@@ -21,10 +21,8 @@ import com.oleg.mahjongclubbooster.autoclick.TapAccessibilityService;
 import com.oleg.mahjongclubbooster.constant.PathType;
 import com.oleg.mahjongclubbooster.constant.RequestCode;
 import com.oleg.mahjongclubbooster.update.CheckUpdate;
-import com.oleg.mahjongclubbooster.userservice.FileExplorerServiceManager;
 import com.oleg.mahjongclubbooster.util.FileTools;
 import com.oleg.mahjongclubbooster.util.PermissionTools;
-import com.oleg.mahjongclubbooster.util.SPUtils;
 import com.oleg.mahjongclubbooster.util.ToastUtils;
 
 import rikka.shizuku.Shizuku;
@@ -36,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements Shizuku.OnRequest
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		CheckUpdate.checkUpdate(this);
+//		CheckUpdate.checkUpdate(this);
 		FileTools.defineRootPath(this);
 		if (PermissionTools.isShizukuAvailable()) {
 			Shizuku.addRequestPermissionResultListener(this);
@@ -58,16 +56,27 @@ public class MainActivity extends AppCompatActivity implements Shizuku.OnRequest
 		if (checkDrawOverlayPermission()) {
 			startOverlayService();
 		}
+		// Check accessibility permission
 		if(!isAccessibilityServiceEnabled(this, TapAccessibilityService.class)){
 			showAccessibilityPermission();
 		}
 		// Check storage permission
 		if (PermissionTools.hasStoragePermission()) {
-			if (!SPUtils.getUseNewDocument()) {
-				checkShizukuPermission();
-			}
+			checkPermissionToFiles();
 		} else {
 			showStoragePermissionDialog();
+		}
+	}
+
+	private void checkPermissionToFiles() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && PermissionTools.isShizukuAvailable()) {
+			if (PermissionTools.hasShizukuPermission()) {
+				FileTools.specialPathReadType = PathType.SHIZUKU;
+			} else {
+				PermissionTools.requestShizukuPermission();
+			}
+		} else if (FileTools.shouldRequestUriPermission(FileTools.dataPath)) {
+			showRequestUriPermissionDialog();
 		}
 	}
 
@@ -114,10 +123,6 @@ public class MainActivity extends AppCompatActivity implements Shizuku.OnRequest
 		}
 	}
 
-	ActivityResultLauncher<Intent> startActivityIntent = registerForActivityResult(
-			new ActivityResultContracts.StartActivityForResult(),
-			result -> this.startOverlayService());
-
 	private void showAccessibilityPermission() {
 		new AlertDialog.Builder(this)
 				.setCancelable(false)
@@ -127,7 +132,6 @@ public class MainActivity extends AppCompatActivity implements Shizuku.OnRequest
 				.setNegativeButton(R.string.dialog_button_cancel, (dialog, which) -> {
 				}).create().show();
 	}
-	// Storage and file access part
 
 	private void showStoragePermissionDialog() {
 		new AlertDialog.Builder(this)
@@ -148,6 +152,10 @@ public class MainActivity extends AppCompatActivity implements Shizuku.OnRequest
 				.setNegativeButton(R.string.dialog_button_cancel, (dialog, which) -> {
 				}).create().show();
 	}
+
+	ActivityResultLauncher<Intent> startActivityIntent = registerForActivityResult(
+			new ActivityResultContracts.StartActivityForResult(),
+			result -> this.startOverlayService());
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -175,26 +183,10 @@ public class MainActivity extends AppCompatActivity implements Shizuku.OnRequest
 		}
 	}
 
-	private void checkShizukuPermission() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-			if (PermissionTools.isShizukuAvailable()) {
-				if (PermissionTools.hasShizukuPermission()) {
-					FileTools.specialPathReadType = PathType.SHIZUKU;
-					FileExplorerServiceManager.bindService();
-				} else {
-					PermissionTools.requestShizukuPermission();
-				}
-			}
-		}
-	}
-
 	protected void onStoragePermissionResult(boolean granted) {
 		if (granted) {
 			ToastUtils.shortCall(R.string.toast_permission_granted);
-			checkShizukuPermission();
-			if (FileTools.shouldRequestUriPermission(FileTools.dataPath)) {
-				showRequestUriPermissionDialog();
-			}
+			checkPermissionToFiles();
 		} else {
 			ToastUtils.shortCall(R.string.toast_permission_not_granted);
 			showStoragePermissionDialog();
@@ -214,7 +206,6 @@ public class MainActivity extends AppCompatActivity implements Shizuku.OnRequest
 		if (requestCode == RequestCode.SHIZUKU) {
 			if (grantResult == PackageManager.PERMISSION_GRANTED) {
 				FileTools.specialPathReadType = PathType.SHIZUKU;
-				FileExplorerServiceManager.bindService();
 			}
 		}
 	}
