@@ -69,12 +69,12 @@ public class GameJSON {
 	public static String currentLevel(Context context) {
 		try {
 			String a = loadExternalJSON(context, FileTools.mahjongClubFilesPath, "playerProfile.json");
-			JSONObject names = new JSONObject(a);
-			return String.valueOf((Integer.parseInt(names.getString("levelsCompleted")) + 1));
+			JSONObject b = new JSONObject(a);
+			return String.valueOf((Integer.parseInt(b.getString("levelsCompleted")) + 1));
 		} catch (JSONException e) {
 			Log.e("currentLevel", String.valueOf(e));
 		}
-		return "N/A";
+		return "Попробуй еще раз";
 	}
 
 	public static void currentLevelStatusPatch(Context context, String level) {
@@ -93,5 +93,51 @@ public class GameJSON {
 		} catch (JSONException e) {
 			Log.e("currentLevelStatus", String.valueOf(e));
 		}
+	}
+
+	public static String[] getDates(Context context) {
+		String[] data = new String[10];
+		try {
+			String a = loadExternalJSON(context, FileTools.mahjongClubFilesPath + "Data/", "butterfly_event_data.gvmc");
+			JSONObject b = new JSONObject(a);
+			data[0] = b.getString("startDate");
+			data[1] = b.getString("endDate");
+			a = loadExternalJSON(context, FileTools.mahjongClubFilesPath + "Data/", "chest_event_data.gvmc");
+			b = new JSONObject(a);
+			data[2] = b.getString("startDate");
+			data[3] = b.getString("endDate");
+			a = loadExternalJSON(context, FileTools.mahjongClubFilesPath + "Data/", "club_tournament_data.gvmc");
+			b = new JSONObject(a);
+			data[4] = b.getString("startDate");
+			data[5] = b.getString("endDate");
+			a = loadExternalJSON(context, FileTools.mahjongClubFilesPath + "Data/", "puzzle_event_data.gvmc");
+			b = new JSONObject(a);
+			data[6] = b.getString("startDate");
+			data[7] = b.getString("endDate");
+			a = loadExternalJSON(context, FileTools.mahjongClubFilesPath + "Data/", "zen_event_data.gvmc");
+			b = new JSONObject(a);
+			data[8] = b.getString("currentTournamentStartDate");
+			data[9] = b.getString("currentTournamentEndDate");
+		} catch (JSONException e) {
+			Log.e("playerInventory", String.valueOf(e));
+		}
+		return data;
+	}
+
+	public static String[] playerInventory(Context context) {
+		String[] data = new String[5];
+		try {
+			String a = loadExternalJSON(context, FileTools.mahjongClubFilesPath + "Data/", "player_inventory.gvmc");
+			JSONObject b = new JSONObject(a);
+			data[0] = b.getString("zenSilver");
+			JSONObject c = b.getJSONObject("boosters");
+			data[1] = c.getString("booster_hint");
+			data[2] = c.getString("booster_bomb");
+			data[3] = c.getString("booster_shuffle");
+			data[4] = c.getString("booster_thunder");
+		} catch (JSONException e) {
+			Log.e("playerInventory", String.valueOf(e));
+		}
+		return data;
 	}
 }

@@ -5,7 +5,6 @@ plugins {
 android {
     namespace 'com.oleg.mahjongclubbooster'
     compileSdk 34
-    buildFeatures.aidl true
 
     defaultConfig {
         applicationId "com.oleg.mahjongclubbooster"
