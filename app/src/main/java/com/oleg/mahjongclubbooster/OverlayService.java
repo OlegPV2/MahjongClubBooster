@@ -28,11 +28,11 @@ import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.oleg.mahjongclubbooster.autoclick.TapAccessibilityService;
+import com.oleg.mahjongclubbooster.constant.BroadcastCode;
+import com.oleg.mahjongclubbooster.constant.TapCode;
 import com.oleg.mahjongclubbooster.util.GameJSON;
 
 public class OverlayService extends Service {
-	public static final String UPDATE_TEXT = "button_text";
-	public static final String ACTION_BROADCAST = "textBroadcast";
 
 	private WindowManager windowManager;
 	private Button button;
@@ -92,10 +92,10 @@ public class OverlayService extends Service {
 				new BroadcastReceiver() {
 					@Override
 					public void onReceive(Context context, Intent intent) {
-						String text = intent.getStringExtra(UPDATE_TEXT);
-						button.setText(text);
+						String text = intent.getStringExtra(BroadcastCode.UPDATE_TEXT);
+						if (button != null)	button.setText(text);
 					}
-				}, new IntentFilter(ACTION_BROADCAST)
+				}, new IntentFilter(BroadcastCode.ACTION_BROADCAST)
 		);
 
 		params.gravity = Gravity.TOP | Gravity.START;
@@ -158,7 +158,7 @@ public class OverlayService extends Service {
 		button.setOnClickListener(arg0 -> {
 			if (autoclickEnabled) {
 				Intent intentAutoclick = new Intent(App.get(), TapAccessibilityService.class);
-				intentAutoclick.putExtra(TapAccessibilityService.ACTION, TapAccessibilityService.STOP);
+				intentAutoclick.putExtra(TapCode.ACTION, TapCode.STOP);
 				startService(intentAutoclick);
 				button.setBackgroundResource(R.drawable.round_button);
 				autoclickEnabled = false;
@@ -188,7 +188,8 @@ public class OverlayService extends Service {
 	private void initiatePopupWindow(View anchor) {
 		String[] menu = new String[]{
 				getString(R.string.popupmenu_item1),
-				getString(R.string.popupmenu_item2)
+				getString(R.string.popupmenu_item2),
+				getString(R.string.popupmenu_item3)
 		};
 		Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 		ListPopupWindow listPopupWindow = new ListPopupWindow(this);
@@ -206,7 +207,7 @@ public class OverlayService extends Service {
 				GameJSON.currentLevelStatusPatch(App.get(), level);
 				button.setBackgroundResource(R.drawable.round_button_green);
 				Intent intent = new Intent(App.get(), TapAccessibilityService.class);
-				intent.putExtra(TapAccessibilityService.ACTION, TapAccessibilityService.PLAY);
+				intent.putExtra(TapCode.ACTION, TapCode.PLAY);
 				intent.putExtra("interval", 10000);
 				int[] location = new int[2];
 				view.getLocationOnScreen(location);
@@ -218,6 +219,10 @@ public class OverlayService extends Service {
 				String level = GameJSON.currentLevel(App.get());
 				button.setText(level);
 				GameJSON.currentLevelStatusPuzzlesPatch(App.get(), level);
+			} else if (position == 2) {
+				String level = GameJSON.currentLevel(App.get());
+				button.setText(level);
+				GameJSON.currentLevelStatusButterflyPatch(App.get(), level);
 			}
 			listPopupWindow.dismiss();
 		});

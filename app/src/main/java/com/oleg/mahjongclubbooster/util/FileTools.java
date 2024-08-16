@@ -15,6 +15,7 @@ import androidx.documentfile.provider.DocumentFile;
 import com.oleg.mahjongclubbooster.App;
 import com.oleg.mahjongclubbooster.constant.PathType;
 import com.oleg.mahjongclubbooster.constant.RequestCode;
+import com.oleg.mahjongclubbooster.shizukuutil.ShizukuFileUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,7 +34,6 @@ import java.util.Objects;
 
 public class FileTools {
     public static String ROOT_PATH;
-//            "/storage/0110-0030/";
     public static String dataPath;
     public static String mahjongClubFilesPath;
     public static String localPath;
@@ -74,12 +74,9 @@ public class FileTools {
 
     private static boolean hasUriPermission(String path) {
         List<UriPermission> uriPermissions = App.get().getContentResolver().getPersistedUriPermissions();
-        Log.d("TAG", "hasUriPermission: uriPermissions = " + uriPermissions);
         String uriPath = pathToUri(path).getPath();
-        Log.d("TAG", "hasUriPermission: uriPath = "+uriPath);
         for (UriPermission uriPermission : uriPermissions) {
             String itemPath = uriPermission.getUri().getPath();
-            Log.d("TAG", "hasUriPermission: itemPath = " + itemPath);
             if (uriPath != null && itemPath != null && (uriPath + "/").contains(itemPath + "/")) {
                 return true;
             }
@@ -161,7 +158,7 @@ public class FileTools {
         return "";
     }
 
-    public static void saveDocumentFile(Context context, String path, String file, byte[] data){
+    private static void saveDocumentFile(Context context, String path, String file, byte[] data){
         Uri pathUri = FileTools.pathToUri(path);
         DocumentFile documentPath = DocumentFile.fromTreeUri(App.get(), pathUri);
         if (documentPath != null) {
@@ -183,7 +180,7 @@ public class FileTools {
         }
     }
 
-    public static void saveFile(String path, String file, byte[] data) {
+    private static void saveFile(String path, String file, byte[] data) {
         try {
             File fileToSave = new File(path, file);
             if (fileToSave.exists()) {
@@ -197,6 +194,64 @@ public class FileTools {
         } catch (Exception e) {
             Log.e("saveFile", e.toString());
         }
+    }
+
+    public static void saveToFile(Context context, String path, String file, byte[] data) {
+        if (specialPathReadType != PathType.SHIZUKU) {
+            if (!shouldRequestUriPermission(dataPath)) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    saveDocumentFile(context, path, file, data);
+                } else {
+                    saveFile(path, file, data);
+                }
+            }
+        } else {
+            saveFile(localPath, file, data);
+            ShizukuFileUtil.remove(path + file);
+            ShizukuFileUtil.move(localPath + file, mahjongClubFilesPath + file);
+        }
+    }
+
+    private static List<String> getFileListByFile(String path) {
+        List<String> list = new ArrayList<>();
+        File dir = new File(path);
+        File[] files;
+        if ((files = dir.listFiles()) != null) {
+            for (File file : files) {
+                list.add(file.getName().substring(0, file.getName().length() - 5));
+            }
+        }
+        return list;
+    }
+
+    private static List<String> getFileListByDocument(String path) {
+        Uri pathUri = pathToUri(path);
+        DocumentFile documentFile = DocumentFile.fromTreeUri(App.get(), pathUri);
+        List<String> list = new ArrayList<>();
+        if (documentFile != null) {
+            DocumentFile[] documentFiles = documentFile.listFiles();
+            for (DocumentFile df : documentFiles) {
+                String f = df.getName();
+                if (f != null) list.add(f.substring(0, f.length() - 5));
+            }
+        }
+        return list;
+    }
+
+    public static List<String> getFilesList() {
+        List<String> list = new ArrayList<>();
+        if (specialPathReadType != PathType.SHIZUKU) {
+            if (!shouldRequestUriPermission(dataPath)) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    list = getFileListByDocument(mahjongClubFilesPath + "LevelsData/");
+                } else {
+                    list = getFileListByFile(mahjongClubFilesPath + "LevelsData/");
+                }
+            }
+        } else {
+            list = ShizukuFileUtil.list(mahjongClubFilesPath + "LevelsData/");
+        }
+        return list;
     }
 
     public static void cleanDailyChallengeLevelsStatus() {

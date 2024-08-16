@@ -22,14 +22,15 @@
         android:layout_marginTop="@dimen/margin"
         android:background="@drawable/shape"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:scrollbars="vertical">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:textColor="@color/black"
             android:text="@string/events_header"
+            android:textColor="@color/black"
             android:textSize="@dimen/text_header" />
 
         <LinearLayout
@@ -50,8 +51,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:textColor="@color/black"
                     android:text="@string/butterfly_header"
+                    android:textColor="@color/black"
                     android:textSize="@dimen/text_main" />
 
                 <LinearLayout
@@ -65,8 +66,8 @@
                         android:layout_height="wrap_content"
                         android:paddingStart="@dimen/padding_space"
                         android:paddingEnd="@dimen/padding_space"
-                        android:textColor="@color/black"
                         android:text="@string/event_start"
+                        android:textColor="@color/black"
                         android:textSize="@dimen/text_main" />
 
                     <TextView
@@ -82,8 +83,8 @@
                         android:layout_marginStart="20dp"
                         android:paddingStart="@dimen/padding_space"
                         android:paddingEnd="@dimen/padding_space"
-                        android:textColor="@color/black"
                         android:text="@string/event_end"
+                        android:textColor="@color/black"
                         android:textSize="@dimen/text_main" />
 
                     <TextView
@@ -107,8 +108,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:textColor="@color/black"
                     android:text="@string/chest_header"
+                    android:textColor="@color/black"
                     android:textSize="@dimen/text_main" />
 
                 <LinearLayout
@@ -122,8 +123,8 @@
                         android:layout_height="wrap_content"
                         android:paddingStart="@dimen/padding_space"
                         android:paddingEnd="@dimen/padding_space"
-                        android:textColor="@color/black"
                         android:text="@string/event_start"
+                        android:textColor="@color/black"
                         android:textSize="@dimen/text_main" />
 
                     <TextView
@@ -139,8 +140,8 @@
                         android:layout_marginStart="20dp"
                         android:paddingStart="@dimen/padding_space"
                         android:paddingEnd="@dimen/padding_space"
-                        android:textColor="@color/black"
                         android:text="@string/event_end"
+                        android:textColor="@color/black"
                         android:textSize="@dimen/text_main" />
 
                     <TextView
@@ -164,8 +165,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:textColor="@color/black"
                     android:text="@string/tournament_header"
+                    android:textColor="@color/black"
                     android:textSize="@dimen/text_main" />
 
                 <LinearLayout
@@ -179,8 +180,8 @@
                         android:layout_height="wrap_content"
                         android:paddingStart="@dimen/padding_space"
                         android:paddingEnd="@dimen/padding_space"
-                        android:textColor="@color/black"
                         android:text="@string/event_start"
+                        android:textColor="@color/black"
                         android:textSize="@dimen/text_main" />
 
                     <TextView
@@ -196,8 +197,8 @@
                         android:layout_marginStart="20dp"
                         android:paddingStart="@dimen/padding_space"
                         android:paddingEnd="@dimen/padding_space"
-                        android:textColor="@color/black"
                         android:text="@string/event_end"
+                        android:textColor="@color/black"
                         android:textSize="@dimen/text_main" />
 
                     <TextView
@@ -221,8 +222,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:textColor="@color/black"
                     android:text="@string/puzzle_header"
+                    android:textColor="@color/black"
                     android:textSize="@dimen/text_main" />
 
                 <LinearLayout
@@ -236,8 +237,8 @@
                         android:layout_height="wrap_content"
                         android:paddingStart="@dimen/padding_space"
                         android:paddingEnd="@dimen/padding_space"
-                        android:textColor="@color/black"
                         android:text="@string/event_start"
+                        android:textColor="@color/black"
                         android:textSize="@dimen/text_main" />
 
                     <TextView
@@ -253,8 +254,8 @@
                         android:layout_marginStart="20dp"
                         android:paddingStart="@dimen/padding_space"
                         android:paddingEnd="@dimen/padding_space"
-                        android:textColor="@color/black"
                         android:text="@string/event_end"
+                        android:textColor="@color/black"
                         android:textSize="@dimen/text_main" />
 
                     <TextView
@@ -264,6 +265,30 @@
                         android:textColor="@color/black"
                         android:textSize="@dimen/text_main" />
 
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:paddingStart="@dimen/padding_space"
+                        android:paddingEnd="@dimen/padding_space"
+                        android:text="@string/number_of_tiles"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_main" />
+
+                    <TextView
+                        android:id="@+id/puzzle_number_of_the_tiles"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_main" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -286,16 +311,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:textColor="@color/black"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:textColor="@color/black">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingStart="@dimen/padding_space"
                         android:paddingEnd="@dimen/padding_space"
-                        android:textColor="@color/black"
                         android:text="@string/event_start"
+                        android:textColor="@color/black"
                         android:textSize="@dimen/text_main" />
 
                     <TextView
@@ -311,8 +336,8 @@
                         android:layout_marginStart="20dp"
                         android:paddingStart="@dimen/padding_space"
                         android:paddingEnd="@dimen/padding_space"
-                        android:textColor="@color/black"
                         android:text="@string/event_end"
+                        android:textColor="@color/black"
                         android:textSize="@dimen/text_main" />
 
                     <TextView
@@ -323,9 +348,34 @@
                         android:textSize="@dimen/text_main" />
 
                 </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:paddingStart="@dimen/padding_space"
+                        android:paddingEnd="@dimen/padding_space"
+                        android:text="@string/number_of_levels"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_main" />
+
+                    <TextView
+                        android:id="@+id/zen_number_of_the_levels"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_main" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/layout_inventory"
         android:layout_width="match_parent"
@@ -334,19 +384,22 @@
         android:background="@drawable/shape"
         android:gravity="center"
         android:orientation="vertical">
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:textColor="@color/black"
             android:text="@string/inventory_header"
+            android:textColor="@color/black"
             android:textSize="@dimen/text_header" />
+
         <LinearLayout
             android:id="@+id/layout_inventory_collapsable"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true"
             android:orientation="vertical">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -358,8 +411,8 @@
                     android:layout_height="wrap_content"
                     android:paddingStart="@dimen/padding_space"
                     android:paddingEnd="@dimen/padding_space"
-                    android:textColor="@color/black"
                     android:text="@string/inventory_zen_silver"
+                    android:textColor="@color/black"
                     android:textSize="@dimen/text_main" />
 
                 <TextView
@@ -368,14 +421,15 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
                     android:textSize="@dimen/text_main" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:paddingStart="@dimen/padding_space"
                     android:paddingEnd="@dimen/padding_space"
-                    android:textColor="@color/black"
                     android:text="@string/inventory_hint"
+                    android:textColor="@color/black"
                     android:textSize="@dimen/text_main" />
 
                 <TextView
@@ -384,14 +438,15 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
                     android:textSize="@dimen/text_main" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:paddingStart="@dimen/padding_space"
                     android:paddingEnd="@dimen/padding_space"
-                    android:textColor="@color/black"
                     android:text="@string/inventory_bomb"
+                    android:textColor="@color/black"
                     android:textSize="@dimen/text_main" />
 
                 <TextView
@@ -401,6 +456,7 @@
                     android:textColor="@color/black"
                     android:textSize="@dimen/text_main" />
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -412,8 +468,8 @@
                     android:layout_height="wrap_content"
                     android:paddingStart="@dimen/padding_space"
                     android:paddingEnd="@dimen/padding_space"
-                    android:textColor="@color/black"
                     android:text="@string/inventory_shuffle"
+                    android:textColor="@color/black"
                     android:textSize="@dimen/text_main" />
 
                 <TextView
@@ -422,14 +478,15 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
                     android:textSize="@dimen/text_main" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:paddingStart="@dimen/padding_space"
                     android:paddingEnd="@dimen/padding_space"
-                    android:textColor="@color/black"
                     android:text="@string/inventory_thunder"
+                    android:textColor="@color/black"
                     android:textSize="@dimen/text_main" />
 
                 <TextView
@@ -440,6 +497,31 @@
                     android:textSize="@dimen/text_main" />
             </LinearLayout>
         </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape"
+        android:layout_marginTop="@dimen/margin"
+        android:gravity="center"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:paddingStart="@dimen/padding_space"
+            android:paddingEnd="@dimen/padding_space"
+            android:text="@string/golden_tiles_text"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_main" />
+        <Spinner
+            android:id="@+id/golden_tiles_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            />
+
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"

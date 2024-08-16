@@ -1,4 +1,4 @@
-package com.oleg.mahjongclubbooster.readdata;
+package com.oleg.mahjongclubbooster.shizukuutil;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

@@ -14,7 +14,10 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -40,9 +43,12 @@ public class MainActivity extends AppCompatActivity implements Shizuku.OnRequest
 	TextView butterflyStart, butterflyEnd;
 	TextView chestStart, chestEnd;
 	TextView tournamentStart, tournamentEnd;
-	TextView puzzlesStart, puzzlesEnd;
-	TextView zenStart, zenEnd;
+	TextView puzzlesStart, puzzlesEnd, puzzleTiles;
+	TextView zenStart, zenEnd, zenLevels;
 	TextView zenSilver, hint, bomb, shuffle, thunder;
+	Spinner goldenTiles;
+
+	public static int goldenTilesNumber = 8;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -77,19 +83,41 @@ public class MainActivity extends AppCompatActivity implements Shizuku.OnRequest
 		tournamentEnd = findViewById(R.id.tournament_end_date);
 		puzzlesStart = findViewById(R.id.puzzle_start_date);
 		puzzlesEnd = findViewById(R.id.puzzle_end_date);
+		puzzleTiles = findViewById(R.id.puzzle_number_of_the_tiles);
 		zenStart = findViewById(R.id.zen_start_date);
 		zenEnd = findViewById(R.id.zen_end_date);
-		String[] dates = GameJSON.getDates(this);
-		butterflyStart.setText(dates[0]);
-		butterflyEnd.setText(dates[1]);
-		chestStart.setText(dates[2]);
-		chestEnd.setText(dates[3]);
-		tournamentStart.setText(dates[4]);
-		tournamentEnd.setText(dates[5]);
-		puzzlesStart.setText(dates[6]);
-		puzzlesEnd.setText(dates[7]);
-		zenStart.setText(dates[8]);
-		zenEnd.setText(dates[9]);
+		zenLevels = findViewById(R.id.zen_number_of_the_levels);
+		String[] data = GameJSON.getDataInfo(this);
+		butterflyStart.setText(data[0]);
+		butterflyEnd.setText(data[1]);
+		chestStart.setText(data[2]);
+		chestEnd.setText(data[3]);
+		tournamentStart.setText(data[4]);
+		tournamentEnd.setText(data[5]);
+		puzzlesStart.setText(data[6]);
+		puzzlesEnd.setText(data[7]);
+		puzzleTiles.setText(data[8]);
+		zenStart.setText(data[9]);
+		zenEnd.setText(data[10]);
+		zenLevels.setText(data[11]);
+
+		goldenTiles = findViewById(R.id.golden_tiles_number);
+		ArrayAdapter<?> adapter = ArrayAdapter.createFromResource(this, R.array.golden_tiles_numbers, R.layout.spinner_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		goldenTiles.setAdapter(adapter);
+		goldenTiles.setSelection(3);
+		goldenTiles.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+				goldenTilesNumber = 2;
+				for (int j = 0; j < i; j++) goldenTilesNumber += 2;
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> adapterView) {
+
+			}
+		});
 
 		layoutInventoryCollapsable = findViewById(R.id.layout_inventory_collapsable);
 		layoutInventory = findViewById(R.id.layout_inventory);
@@ -110,7 +138,9 @@ public class MainActivity extends AppCompatActivity implements Shizuku.OnRequest
 		hint.setText(inventory[1]);
 		bomb.setText(inventory[2]);
 		shuffle.setText(inventory[3]);
-		thunder.setText(inventory[4]);
+		String tiles = "";
+		if (inventory[4] != null) tiles = String.valueOf(Integer.parseInt(inventory[4]) * 2);
+		thunder.setText(getString(R.string.inventory_thunder_and_tiles, inventory[4], tiles));
 	}
 
 	private void expand(View view) {

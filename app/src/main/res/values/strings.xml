@@ -6,24 +6,28 @@
 
     <string name="events_header">Даты событий</string>
     <string name="butterfly_header">Событие \"Бабочки\"</string>
-    <string name="butterfly_button_collect">Собрать призы</string>
-    <string name="butterfly_button_restore">Восстановить файл</string>
+    <string name="chest_header">Событие \"Сундук\"</string>
+    <string name="tournament_header">Событие \"Турнир\"</string>
+    <string name="puzzle_header">Событие \"Пазлы\"</string>
+    <string name="zen_header">Событие \"Дзен\"</string>
+    <string name="number_of_tiles">Количество плиток</string>
+    <string name="number_of_levels">Количество уровней</string>
 
     <string name="inventory_header">Инвентарь</string>
     <string name="inventory_zen_silver">Серебро</string>
     <string name="inventory_hint">Подсказки</string>
     <string name="inventory_bomb">Бомбы</string>
     <string name="inventory_shuffle">Перетасовка</string>
-    <string name="inventory_thunder">Молнии</string>
+    <string name="inventory_thunder">Молнии/Плитки</string>
+    <string name="inventory_thunder_and_tiles">%1$s / %2$s</string>
 
-    <string name="chest_header">Событие \"Сундук\"</string>
-    <string name="tournament_header">Событие \"Турнир\"</string>
-    <string name="puzzle_header">Событие \"Пазлы\"</string>
-    <string name="zen_header">Событие \"Дзен\"</string>
-
-    <string name="experience_header">Прокачка опыта</string>
-    <string name="experience_text">Текущий пройденый уровень</string>
-    <string name="experience_button">Создать следующий уровень</string>
+    <string name="golden_tiles_text">Количество золотых плиток на уровень</string>
+    <string-array name="golden_tiles_numbers">
+        <item>2</item>
+        <item>4</item>
+        <item>6</item>
+        <item>8</item>
+    </string-array>
 
     <string name="dialog_accessibility_message">Для работы автокликера на кнопке необходимо разрешение на полное управление устройством.\nНа следующем экране необходимо найти в списке приложение <b>Mahjong Club Tap Service</b> и выдать разрешение.\n\nВ случае, если приложение в списке недоступно, надо зайти в Настройки -> Приложения -> Mahjong Club Booster. В правом верхнем углу нажать три точки и Разрешить доступ к настройкам. После этого перезапускить приложение</string>
     <string name="dialog_storage_message">Для управления файлами требуются разрешения на доступ ко всем файлам на устройстве.</string>
@@ -38,9 +42,11 @@
     <string name="toast_shizuku_load_file_failed">Не удалось получить доступ, пожалуйста, повторно авторизуйте Shizuku!</string>
 
     <string name="button_default_text">Начать</string>
+    <string name="button_try_again_text">Попробуй еще раз</string>
 
     <string name="popupmenu_item1">Автоклик на 10 с</string>
     <string name="popupmenu_item2">Создать уровень с пазлами</string>
+    <string name="popupmenu_item3">Создать уровень с бабочками</string>
 
     <string name="autoclick_enabled">Автоклик запущен</string>
     <string name="autoclick_disabled">Автоклик остановлен</string>
@@ -53,10 +59,10 @@
         \n
         Возможности кнопки:\n
         1. Одинарное нажатие на кнопку создает новый уровень в игре. Номер уровня соответствует номеру на кнопке после нажатия.\n
-        2. Двойное нажатие на кнопку открывает меню. В нем два пункта: автокликер и сгенерировать уровень с пазлами.\n
+        2. Двойное нажатие на кнопку открывает меню: автокликер, сгенерировать уровень с пазлами, сгенерировать уровень с бабочками.\n
         3. Закрытие этого окна выключает кнопку.\n
         \n
-        Перед запуском автокликера надо расположить кнопку в требуемом месте. Автонажатие производится левым нижним углом, соответственно, расположить ее надо таким образом, чтобы левый нижний угол кнопки попадал на кнопку следующего уровня игры.\n
+        Перед запуском автокликера надо расположить кнопку в требуемом месте. Автонажатие производится левым нижним углом, помеченным красным, соответственно, расположить ее надо таким образом, чтобы левый нижний угол кнопки попадал на кнопку следующего уровня игры.\n
         Для запуска, дважды нажать на кнопку и выбрать пункт выпадающего меню. Кнопка фиксируется на месте и происходит автоматическое нажатие с интервалом в 10 секунд.\n
         Повторное одинарное нажатие на кнопку останавливает автокликер, фиксация кнопки снимается и ее можно опять перетаскивать по экрану.\n
         Необходимо помнить, что когда игра предлагает выбор играть обычные уровни или ежедневки, то кнопка запуска последующего уровня смещается. Поэтому перед запуском автокликера необходимо пройти первый уровень и потом выставлять кнопку в нужное место.\n

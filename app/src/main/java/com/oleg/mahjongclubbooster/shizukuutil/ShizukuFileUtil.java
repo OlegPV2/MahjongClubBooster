@@ -1,6 +1,6 @@
-package com.oleg.mahjongclubbooster.readdata;
+package com.oleg.mahjongclubbooster.shizukuutil;
 
-import static com.oleg.mahjongclubbooster.readdata.Exec.ShizukuExec;
+import static com.oleg.mahjongclubbooster.shizukuutil.Exec.ShizukuExec;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,14 +12,13 @@ import java.util.function.Function;
  */
 public class ShizukuFileUtil {
 
-    public static List list(String path) {
-        final ArrayList<String> files = new ArrayList<>();
+    public static List<String> list(String path) {
+        final List<String> files = new ArrayList<>();
         try {
-            if(files.size() !=0) files.clear();
             ShizukuExec("ls " + path, new Function<String, String>(){
                     @Override
                     public String apply(String t) {
-                        files.add(t);
+                        files.add(t.substring(0, t.length() - 5));
                         return null;
                     }
                 }, null, null);
