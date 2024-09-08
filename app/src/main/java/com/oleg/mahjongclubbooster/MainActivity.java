@@ -1,7 +1,5 @@
 package com.oleg.mahjongclubbooster;
 
-import android.animation.Animator;
-import android.animation.ValueAnimator;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -11,11 +9,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -29,10 +30,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.oleg.mahjongclubbooster.autoclick.TapAccessibilityService;
 import com.oleg.mahjongclubbooster.constant.PathType;
 import com.oleg.mahjongclubbooster.constant.RequestCode;
+import com.oleg.mahjongclubbooster.overlay.ButtonOverlayService;
 import com.oleg.mahjongclubbooster.util.FileTools;
 import com.oleg.mahjongclubbooster.util.GameJSON;
 import com.oleg.mahjongclubbooster.util.PermissionTools;
+import com.oleg.mahjongclubbooster.util.RunningApps;
 import com.oleg.mahjongclubbooster.util.ToastUtils;
+import com.oleg.mahjongclubbooster.util.ViewAnimationUtil;
 
 import rikka.shizuku.Shizuku;
 
@@ -47,8 +51,15 @@ public class MainActivity extends AppCompatActivity implements Shizuku.OnRequest
 	TextView zenStart, zenEnd, zenLevels;
 	TextView zenSilver, hint, bomb, shuffle, thunder;
 	Spinner goldenTiles;
+	EditText autoClickButtonTimer, autoClickPointTimer;
+	Button buttonOn, buttonOff, buttonSend;
+
+	private static final String packageName = "com.gamovation.mahjongclub";
+	private static final boolean availableSendButton = true;
 
 	public static int goldenTilesNumber = 8;
+	public static long autoClickButtonTimerValue;
+	public static long autoClickPointTimerValue;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements Shizuku.OnRequest
 		setContentView(R.layout.activity_main);
 
 //		CheckUpdate.checkUpdate(this);
-		FileTools.defineRootPath(this);
+		FileTools.defineRootPath(this, packageName);
 		if (PermissionTools.isShizukuAvailable()) {
 			Shizuku.addRequestPermissionResultListener(this);
 		}
@@ -70,9 +81,9 @@ public class MainActivity extends AppCompatActivity implements Shizuku.OnRequest
 		layoutEvents = findViewById(R.id.layout_events);
 		layoutEvents.setOnClickListener(view -> {
 			if (layoutEventsCollapsable.getVisibility() == View.GONE) {
-				expand(layoutEventsCollapsable);
+				ViewAnimationUtil.expand(layoutEventsCollapsable);
 			} else {
-				collapse(layoutEventsCollapsable);
+				ViewAnimationUtil.collapse(layoutEventsCollapsable);
 			}
 		});
 		butterflyStart = findViewById(R.id.butterfly_start_date);
@@ -114,18 +125,16 @@ public class MainActivity extends AppCompatActivity implements Shizuku.OnRequest
 			}
 
 			@Override
-			public void onNothingSelected(AdapterView<?> adapterView) {
-
-			}
+			public void onNothingSelected(AdapterView<?> adapterView) {}
 		});
 
 		layoutInventoryCollapsable = findViewById(R.id.layout_inventory_collapsable);
 		layoutInventory = findViewById(R.id.layout_inventory);
 		layoutInventory.setOnClickListener(view -> {
 			if (layoutInventoryCollapsable.getVisibility() == View.GONE) {
-				expand(layoutInventoryCollapsable);
+				ViewAnimationUtil.expand(layoutInventoryCollapsable);
 			} else {
-				collapse(layoutInventoryCollapsable);
+				ViewAnimationUtil.collapse(layoutInventoryCollapsable);
 			}
 		});
 		zenSilver = findViewById(R.id.zen_silver);
@@ -141,63 +150,70 @@ public class MainActivity extends AppCompatActivity implements Shizuku.OnRequest
 		String tiles = "";
 		if (inventory[4] != null) tiles = String.valueOf(Integer.parseInt(inventory[4]) * 2);
 		thunder.setText(getString(R.string.inventory_thunder_and_tiles, inventory[4], tiles));
-	}
-
-	private void expand(View view) {
-		view.setVisibility(View.VISIBLE);
-
-		final int widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-		final int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-		view.measure(widthSpec, heightSpec);
-
-		ValueAnimator mAnimator = slideAnimator(view, 0, view.getMeasuredHeight());
-		mAnimator.start();
-	}
-
-	private void collapse(View view) {
-		int finalHeight = view.getHeight();
-
-		ValueAnimator mAnimator = slideAnimator(view, finalHeight, 0);
-
-		mAnimator.addListener(new Animator.AnimatorListener() {
+		autoClickButtonTimer = findViewById(R.id.autoclick_button_timer);
+		autoClickButtonTimerValue = Long.parseLong(autoClickButtonTimer.getText().toString());
+		autoClickButtonTimer.addTextChangedListener(new TextWatcher() {
 			@Override
-			public void onAnimationStart(@NonNull Animator animation) {
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+				if (charSequence.length() > 0)
+					autoClickButtonTimerValue = Integer.parseInt(charSequence.toString());
 			}
 
 			@Override
-			public void onAnimationEnd(@NonNull Animator animator) {
-				//Height=0, but it set visibility to GONE
-				view.setVisibility(View.GONE);
-			}
-
-			@Override
-			public void onAnimationCancel(@NonNull Animator animation) {
-			}
-
-			@Override
-			public void onAnimationRepeat(@NonNull Animator animation) {
-			}
+			public void afterTextChanged(Editable editable) {}
 		});
-		mAnimator.start();
-	}
+		autoClickPointTimer = findViewById(R.id.autoclick_point_timer);
+		autoClickPointTimerValue = Long.parseLong(autoClickPointTimer.getText().toString());
+		autoClickPointTimer.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
-	private ValueAnimator slideAnimator(View view, int start, int end) {
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+				if (charSequence.length() > 0)
+					autoClickPointTimerValue = Integer.parseInt(charSequence.toString());
+			}
 
-		ValueAnimator animator = ValueAnimator.ofInt(start, end);
-
-		animator.addUpdateListener(valueAnimator -> {
-			//Update Height
-			int value = (Integer) valueAnimator.getAnimatedValue();
-			ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-			layoutParams.height = value;
-			view.setLayoutParams(layoutParams);
+			@Override
+			public void afterTextChanged(Editable editable) {}
 		});
-		return animator;
+		buttonSend = findViewById(R.id.button_send);
+		if (availableSendButton) {
+			buttonSend.setOnClickListener(buttonSendListener);
+		} else {
+			buttonSend.setVisibility(View.GONE);
+		}
+		buttonOn = findViewById(R.id.button_on);
+		buttonOn.setOnClickListener(view -> {
+			if (!ButtonOverlayService.isServiceRun)
+				startService(new Intent(this, ButtonOverlayService.class));
+		});
+		buttonOff = findViewById(R.id.button_off);
+		buttonOff.setOnClickListener(view -> {
+			if (ButtonOverlayService.isServiceRun)
+				stopService(new Intent(this, ButtonOverlayService.class));
+		});
 	}
+
+	private final View.OnClickListener buttonSendListener = view ->  {
+		if (RunningApps.isAppRunning(this, packageName)) {
+			ToastUtils.longCall(R.string.game_is_running_message);
+		} else {
+			if (GameJSON.copyRequestFile(App.get())) {
+				Intent launchIntent = getPackageManager().getLaunchIntentForPackage(packageName);
+				if (launchIntent != null) {
+					startActivity(launchIntent);
+				}
+			}
+		}
+	};
 
 	@Override
 	protected void onDestroy() {
-		stopService(new Intent(this, OverlayService.class));
+		stopService(new Intent(this, ButtonOverlayService.class));
 		if (PermissionTools.isShizukuAvailable()) {
 			Shizuku.removeRequestPermissionResultListener(this);
 		}
@@ -268,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements Shizuku.OnRequest
 	}
 
 	private void startOverlayService() {
-		Intent intent = new Intent(this, OverlayService.class);
+		Intent intent = new Intent(this, ButtonOverlayService.class);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			startForegroundService(intent);
 		} else {

@@ -2,6 +2,7 @@ package com.oleg.mahjongclubbooster.util;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Environment;
 import android.util.Log;
 
 import com.oleg.mahjongclubbooster.MainActivity;
@@ -13,6 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -52,7 +54,7 @@ public class GameJSON {
 		return jString;
 	}
 
-	public static String currentLevel(Context context) {
+	public static String getCurrentLevel(Context context) {
 		try {
 			String a = loadExternalJSON(context, FileTools.mahjongClubFilesPath, "playerProfile.json");
 			JSONObject b = new JSONObject(a);
@@ -63,7 +65,7 @@ public class GameJSON {
 		return context.getResources().getString(R.string.button_try_again_text);
 	}
 
-	public static String currentLevelFromLevelsData(Context context) {
+	public static String getCurrentLevelFromLevelsData(Context context) {
 		List<String> list = FileTools.getFilesList();
 		List<Integer> integerList = list.stream().map(Integer::valueOf).collect(Collectors.toList());
 		int max = Integer.MIN_VALUE;
@@ -169,5 +171,14 @@ public class GameJSON {
 			Log.e("playerInventory", String.valueOf(e));
 		}
 		return data;
+	}
+
+	public static boolean copyRequestFile(Context context) {
+		byte[] file = FileTools.readByteFile(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "requests_queue.gvmc"));
+		if (file != null) {
+			FileTools.saveToFile(context, FileTools.mahjongClubFilesPath + "Requests/", "requests_queue.gvmc", file);
+			return true;
+		}
+		return false;
 	}
 }

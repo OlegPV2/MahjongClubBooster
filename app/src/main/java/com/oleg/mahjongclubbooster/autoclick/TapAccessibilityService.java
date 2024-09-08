@@ -14,6 +14,7 @@ import com.oleg.mahjongclubbooster.App;
 import com.oleg.mahjongclubbooster.R;
 import com.oleg.mahjongclubbooster.constant.BroadcastCode;
 import com.oleg.mahjongclubbooster.constant.TapCode;
+import com.oleg.mahjongclubbooster.overlay.ButtonOverlayService;
 import com.oleg.mahjongclubbooster.util.GameJSON;
 import com.oleg.mahjongclubbooster.util.ToastUtils;
 
@@ -22,7 +23,11 @@ public class TapAccessibilityService extends AccessibilityService {
 	private Handler mHandler;
 	private int mX;
 	private int mY;
-	private int mInterval;
+	private long mInterval;
+	private int sX;
+	private int sY;
+	private long sInterval;
+	private int nextTap = 0;
 
 	@Override
 	public void onCreate() {
@@ -34,12 +39,13 @@ public class TapAccessibilityService extends AccessibilityService {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+
 		if (intent != null) {
 			String action = intent.getStringExtra(TapCode.ACTION);
 			if (TapCode.PLAY.equals(action)) {
 				mX = intent.getIntExtra("x", 0);
 				mY = intent.getIntExtra("y", 0);
-				mInterval = intent.getIntExtra("interval", 10000);
+				mInterval = intent.getLongExtra("interval", 10000);
 				if (myRunnable == null) {
 					myRunnable = new myRunnable();
 				}
@@ -48,6 +54,10 @@ public class TapAccessibilityService extends AccessibilityService {
 			} else if (TapCode.STOP.equals(action)) {
 				mHandler.removeCallbacksAndMessages(null);
 				ToastUtils.shortCall(R.string.autoclick_disabled);
+			} else if (TapCode.SECOND_POINT.equals(action)) {
+				sX = intent.getIntExtra("x", 0);
+				sY = intent.getIntExtra("y", 0);
+				sInterval = intent.getLongExtra("interval", 10000);
 			}
 		}
 		return super.onStartCommand(intent, flags, startId);
@@ -63,9 +73,9 @@ public class TapAccessibilityService extends AccessibilityService {
 	}
 
 	private void tap(int x, int y) {
-		String level = GameJSON.currentLevel(App.get());
+		String level = GameJSON.getCurrentLevel(App.get());
 		if (level.equals(App.get().getResources().getString(R.string.button_try_again_text)))
-			level = GameJSON.currentLevel(App.get());
+			level = GameJSON.getCurrentLevel(App.get());
 		GameJSON.currentLevelStatusPatch(App.get(), level);
 		Path swipePath = new Path();
 		swipePath.moveTo(x, y);
@@ -73,12 +83,24 @@ public class TapAccessibilityService extends AccessibilityService {
 		GestureDescription.Builder gBuilder = new GestureDescription.Builder();
 		gBuilder.addStroke(new GestureDescription.StrokeDescription(swipePath, 0, 1));
 		String finalLevel = level;
+//		if (nextTap == 1) buttonOverlayService.hideAim();
 		dispatchGesture(gBuilder.build(), new GestureResultCallback() {
 			@Override
 			public void onCompleted(GestureDescription gestureDescription) {
 				super.onCompleted(gestureDescription);
-				sendUpdateTextToButton(finalLevel);
-				mHandler.postDelayed(myRunnable, mInterval);
+				if (ButtonOverlayService.secondPointIsOn) {
+					if (nextTap == 0) {
+						sendUpdateTextToButton(finalLevel);
+						mHandler.removeCallbacksAndMessages(myRunnable);
+						mHandler.postDelayed(myRunnable, sInterval);
+					} else if (nextTap == 1) {
+						mHandler.postDelayed(myRunnable, mInterval);
+					}
+				} else {
+					sendUpdateTextToButton(finalLevel);
+					mHandler.removeCallbacksAndMessages(myRunnable);
+					mHandler.postDelayed(myRunnable, mInterval);
+				}
 			}
 
 			@Override
@@ -86,6 +108,7 @@ public class TapAccessibilityService extends AccessibilityService {
 				super.onCancelled(gestureDescription);
 			}
 		}, null);
+//		if (nextTap == 1) buttonOverlayService.showAim();
 	}
 
 	private myRunnable myRunnable;
@@ -94,14 +117,22 @@ public class TapAccessibilityService extends AccessibilityService {
 
 		@Override
 		public void run() {
-			tap(mX, mY);
+			switch (nextTap) {
+				case 0:
+					tap(mX, mY);
+					if (ButtonOverlayService.secondPointIsOn) nextTap += 1;
+					break;
+				case 1:
+					tap(sX, sY);
+					nextTap = 0;
+					break;
+			}
 		}
 	}
 
-	private void sendUpdateTextToButton (String text) {
-		Intent intent = new Intent(BroadcastCode.ACTION_BROADCAST);
-		intent.putExtra(BroadcastCode.UPDATE_TEXT, text);
+	private void sendUpdateTextToButton(String text) {
+		Intent intent = new Intent(BroadcastCode.BROADCAST_BUTTON_TEXT);
+		intent.putExtra(BroadcastCode.BUTTON_TEXT, text);
 		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 	}
-
 }

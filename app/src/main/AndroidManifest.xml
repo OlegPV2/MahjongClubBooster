@@ -36,7 +36,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".OverlayService"
+        <service android:name=".overlay.ButtonOverlayService"
             android:label="BoosterService"
             android:foregroundServiceType="shortService"/>
         <!--            android:process=":separate"-->

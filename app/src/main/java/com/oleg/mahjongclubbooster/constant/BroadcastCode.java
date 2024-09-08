@@ -1,6 +1,6 @@
 package com.oleg.mahjongclubbooster.constant;
 
 public interface BroadcastCode {
-	String ACTION_BROADCAST = "textBroadcast";
-	String UPDATE_TEXT = "button_text";
+	String BROADCAST_BUTTON_TEXT = "update_text";
+	String BUTTON_TEXT = "button_text";
 }
