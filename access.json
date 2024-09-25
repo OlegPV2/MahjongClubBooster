@@ -2,31 +2,31 @@
 	"allowable":[
 		{
 			"username":"* Гайка *",
-			"userId":5549922
+			"user_id":5549922
 		},
 		{
 			"username":"~<~Bonny~>~",
-			"userId":2278628
+			"user_id":2278628
 		},
 		{
 			"username":"   ~Кудесница ~",
-			"userId":31839355
+			"user_id":31839355
 		},
 		{
 			"username":"Amanita ",
-			"userId":37564115
+			"user_id":37564115
 		},
 		{
 			"username":"~~Фулиг@нк@ ;-р",
-			"userId":33721190
+			"user_id":33721190
 		},
 		{
 			"username":"Странник",
-			"userId":37452743
+			"user_id":37452743
 		},
 		{
 			"username":"Третий",
-			"userId":"38756194"
+			"user_id":"38756194"
 		}
 	]
 }
