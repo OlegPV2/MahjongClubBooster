@@ -14,9 +14,9 @@ import com.oleg.mahjongclubbooster.App;
 import com.oleg.mahjongclubbooster.R;
 import com.oleg.mahjongclubbooster.constant.BroadcastCode;
 import com.oleg.mahjongclubbooster.constant.TapCode;
-import com.oleg.mahjongclubbooster.overlay.ButtonOverlayService;
-import com.oleg.mahjongclubbooster.util.GameJSON;
-import com.oleg.mahjongclubbooster.util.ToastUtils;
+import com.oleg.mahjongclubbooster.overlay.FloatingView;
+import com.oleg.mahjongclubbooster.json.GameJSON;
+import com.oleg.mahjongclubbooster.tools.ToastTools;
 
 public class TapAccessibilityService extends AccessibilityService {
 
@@ -50,10 +50,11 @@ public class TapAccessibilityService extends AccessibilityService {
 					myRunnable = new myRunnable();
 				}
 				mHandler.post(myRunnable);
-				ToastUtils.shortCall(R.string.autoclick_enabled);
+				ToastTools.shortCall(R.string.autoclick_enabled);
 			} else if (TapCode.STOP.equals(action)) {
 				mHandler.removeCallbacksAndMessages(null);
-				ToastUtils.shortCall(R.string.autoclick_disabled);
+				nextTap = 0;
+				ToastTools.shortCall(R.string.autoclick_disabled);
 			} else if (TapCode.SECOND_POINT.equals(action)) {
 				sX = intent.getIntExtra("x", 0);
 				sY = intent.getIntExtra("y", 0);
@@ -88,7 +89,7 @@ public class TapAccessibilityService extends AccessibilityService {
 			@Override
 			public void onCompleted(GestureDescription gestureDescription) {
 				super.onCompleted(gestureDescription);
-				if (ButtonOverlayService.secondPointIsOn) {
+				if (FloatingView.isSecondPointIsOn()) {
 					if (nextTap == 0) {
 						sendUpdateTextToButton(finalLevel);
 						mHandler.removeCallbacksAndMessages(myRunnable);
@@ -120,7 +121,7 @@ public class TapAccessibilityService extends AccessibilityService {
 			switch (nextTap) {
 				case 0:
 					tap(mX, mY);
-					if (ButtonOverlayService.secondPointIsOn) nextTap += 1;
+					if (FloatingView.isSecondPointIsOn()) nextTap += 1;
 					break;
 				case 1:
 					tap(sX, sY);

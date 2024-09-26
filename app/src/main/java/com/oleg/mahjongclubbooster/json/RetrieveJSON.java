@@ -1,4 +1,4 @@
-package com.oleg.mahjongclubbooster.update;
+package com.oleg.mahjongclubbooster.json;
 
 import android.app.Activity;
 import android.content.Context;
@@ -15,24 +15,22 @@ import org.json.JSONObject;
 public abstract class RetrieveJSON {
     private final Activity activity;
     private final String jsonUrl;
-    private final UpdateListener listener;
 
-    public RetrieveJSON(Activity activity, String jsonUrl, UpdateListener listener) {
+    public RetrieveJSON(Activity activity, String jsonUrl) {
         this.activity = activity;
         this.jsonUrl = jsonUrl;
-        this.listener = listener;
     }
 
     private void startBackground() {
         boolean cancel = false;
-        if (listener == null || jsonUrl == null) {
-//            Log.d(TAG, "onPreExecute: context == null || listener == null || jsonUrl == null");
+        if (jsonUrl == null) {
+            Log.d("startBackground", "onPreExecute: jsonUrl == null");
             cancel = true;
         } else if (!isNetworkAvailable(activity)) {
-            listener.onError("Please check your network connection");
+            Log.d("startBackground", "Please check your network connection");
             cancel = true;
         } else if (jsonUrl.isEmpty()) {
-            listener.onError("Please provide a valid JSON URL");
+            Log.d("startBackground", "Please provide a valid JSON URL");
             cancel = true;
         }
 

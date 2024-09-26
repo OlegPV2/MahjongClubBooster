@@ -1,4 +1,4 @@
-package com.oleg.mahjongclubbooster.util;
+package com.oleg.mahjongclubbooster.tools;
 
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;

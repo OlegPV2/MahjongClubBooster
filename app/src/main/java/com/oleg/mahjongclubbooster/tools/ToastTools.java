@@ -1,4 +1,4 @@
-package com.oleg.mahjongclubbooster.util;
+package com.oleg.mahjongclubbooster.tools;
 
 import android.widget.Toast;
 
@@ -6,7 +6,7 @@ import androidx.annotation.StringRes;
 
 import com.oleg.mahjongclubbooster.App;
 
-public class ToastUtils {
+public class ToastTools {
     private static Toast sToast;
 
     public static void shortCall(@StringRes int resId) {

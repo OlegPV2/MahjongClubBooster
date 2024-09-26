@@ -1,17 +1,23 @@
 package com.oleg.mahjongclubbooster.update;
 
-import com.king.app.dialog.AppDialog;
-import com.king.app.dialog.AppDialogConfig;
-import com.king.app.updater.AppUpdater;
-import com.king.app.updater.callback.UpdateCallback;
-import com.king.app.updater.http.OkHttpManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.NotificationCompat;
+
 import com.oleg.mahjongclubbooster.MainActivity;
+import com.oleg.mahjongclubbooster.R;
+import com.oleg.mahjongclubbooster.json.RetrieveJSON;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -21,21 +27,8 @@ public class CheckUpdate {
     protected static final String jsonUrl = "https://raw.githubusercontent.com/OlegPV2/MahjongClubBooster/master/update.json";
 
     public static void checkUpdate(MainActivity mainActivity) {
-        UpdateListener listener = new UpdateListener() {
-            @Override
-            public void onJsonDataReceived(UpdateModel updateModel, JSONObject jsonObject) {
-                if (RetrieveJSON.getCurrentVersionCode(mainActivity) < updateModel.getVersionCode()) {
-                    downloadAndInstall(mainActivity, updateModel);
-                }
-            }
 
-            @Override
-            public void onError(String error) {
-
-            }
-        };
-
-        new RetrieveJSON(mainActivity, jsonUrl, listener) {
+        new RetrieveJSON(mainActivity, jsonUrl) {
 
             @Override
             public JSONObject doInBackground() {
@@ -53,7 +46,7 @@ public class CheckUpdate {
 
                     return new JSONObject(sb.toString());
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Log.w("CheckUpdate->doInBackground", e.toString());
                 }
 
                 return null;
@@ -71,67 +64,65 @@ public class CheckUpdate {
                                 jsonObject.getString("updateMessage")
                         );
 
-                        listener.onJsonDataReceived(updateModel, jsonObject);
-
+                        if (RetrieveJSON.getCurrentVersionCode(mainActivity) < updateModel.getVersionCode()) {
+                            downloadAndInstall(mainActivity, updateModel);
+                        }
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        Log.w("CheckUpdate->onPostExecute", e.toString());
                     }
                 } else {
-                    listener.onError("JSON data null");
+                    Log.w("CheckUpdate->onPostExecute", "JSON data null");
                 }
             }
         }.execute();
     }
 
     protected static void downloadAndInstall(MainActivity mainActivity, UpdateModel updateModel) {
-        AppDialogConfig config = new AppDialogConfig(mainActivity);
-        config.setTitle("Upgrade available")
-                .setConfirm("Upgrade")
-                .setCancel("Cancel")
-                .setHideCancel(!updateModel.cancellable)
-                .setContent(updateModel.updateMessage)
-                .setOnClickConfirm(v -> {
-                    AppUpdater appUpdater = new AppUpdater(mainActivity, updateModel.url + updateModel.fileName);
-                    appUpdater.setHttpManager(OkHttpManager.getInstance())
-                            .setUpdateCallback(new UpdateCallback() {
-                                @Override
-                                public void onDownloading(boolean isDownloading) {
-                                    // Downloading: When isDownloading is true, it means that the
-                                    // download is already in progress, that is, the download has been
-                                    // started before; when it is false, it means that the download
-                                    // has not started yet, and the download will start soon
-                                }
+        final String CHANNEL_2_ID = "channel2";
+        int processId = 2;
+        Intent activityIntent = new Intent(mainActivity, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(mainActivity, 0, activityIntent, PendingIntent.FLAG_IMMUTABLE);
+        final NotificationCompat.Builder notification = new NotificationCompat.Builder(mainActivity, CHANNEL_2_ID)
+                .setSmallIcon(R.drawable.ic_stat_name)
+                .setContentTitle("Download")
+                .setOnlyAlertOnce(true)
+                .setOngoing(true)
+                .setContentText("Downloading in process")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(contentIntent);
+        NotificationManager notificationManager = (NotificationManager) mainActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_2_ID, "Download", NotificationManager.IMPORTANCE_HIGH);
+            notificationChannel.setDescription("Downloading in process");
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
 
-                                @Override
-                                public void onStart(String url) {
+        AppUpdater appUpdater = new AppUpdater(mainActivity, updateModel.url, updateModel.fileName) {
+            @Override
+            public void beforeDownloading() {
+                notification.setProgress(100, 0, true);
+                notificationManager.notify(processId, notification.build());
+            }
 
-                                }
+            @Override
+            public void onDownloading(int maxProgress, int progress) {
+                notification.setProgress(maxProgress, progress, false);
+                notification.setShowWhen(true);
+                notificationManager.notify(processId, notification.build());
+            }
 
-                                @Override
-                                public void onProgress(long progress, long total, boolean isChanged) {
-                                    // Download progress update: It is recommended to update the
-                                    // progress of the interface only when isChanged is true;
-                                    // because the actual progress changes frequently
-                                }
-
-                                @Override
-                                public void onFinish(File file) {
-
-                                }
-
-                                @Override
-                                public void onError(Exception e) {
-
-                                }
-
-                                @Override
-                                public void onCancel() {
-
-                                }
-                            }).start();
-
-                    AppDialog.INSTANCE.dismissDialogFragment(mainActivity.getSupportFragmentManager());
-                });
-        AppDialog.INSTANCE.showDialogFragment(mainActivity.getSupportFragmentManager(), config);
+            @Override
+            public void onDownloaded() {
+                notificationManager.cancel(processId);
+            }
+        };
+        new AlertDialog.Builder(mainActivity)
+                .setTitle(R.string.update_title)
+                .setCancelable(!updateModel.cancellable)
+                .setMessage(updateModel.updateMessage)
+                .setPositiveButton(R.string.update_positive_text, (dialog, which) -> appUpdater.execute())
+                .setNegativeButton(R.string.dialog_button_cancel, (dialog, which) -> {})
+                .create()
+                .show();
     }
 }

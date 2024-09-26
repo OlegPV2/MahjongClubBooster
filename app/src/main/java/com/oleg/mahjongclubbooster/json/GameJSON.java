@@ -1,14 +1,17 @@
-package com.oleg.mahjongclubbooster.util;
+package com.oleg.mahjongclubbooster.json;
+
+import static com.oleg.mahjongclubbooster.MainActivityViewInit.getGoldenTilesNumber;
+import static com.oleg.mahjongclubbooster.MainActivityViewInit.getTileTypeNumber;
 
 import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 
-import com.oleg.mahjongclubbooster.MainActivity;
 import com.oleg.mahjongclubbooster.R;
 import com.oleg.mahjongclubbooster.constant.PathType;
 import com.oleg.mahjongclubbooster.shizukuutil.ShizukuFileUtil;
+import com.oleg.mahjongclubbooster.tools.FileTools;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,11 +47,14 @@ public class GameJSON {
 			InputStream is = context.getAssets().open(file);
 			int size = is.available();
 			byte[] buffer = new byte[size];
-			is.read(buffer);
+			if (is.read(buffer) > 0) {
+				jString = new String(buffer, StandardCharsets.UTF_8);
+			} else {
+				jString = "";
+			}
 			is.close();
-			jString = new String(buffer, StandardCharsets.UTF_8);
 		} catch (IOException e) {
-			Log.e("loadJSON", String.valueOf(e));
+			Log.w("loadJSONFromAsset", String.valueOf(e));
 			return "";
 		}
 		return jString;
@@ -60,7 +66,7 @@ public class GameJSON {
 			JSONObject b = new JSONObject(a);
 			return String.valueOf((Integer.parseInt(b.getString("levelsCompleted")) + 1));
 		} catch (JSONException e) {
-			Log.e("currentLevel", String.valueOf(e));
+			Log.w("currentLevel", String.valueOf(e));
 		}
 		return context.getResources().getString(R.string.button_try_again_text);
 	}
@@ -84,7 +90,7 @@ public class GameJSON {
 			if (f.getInt("numberOfStars") == -1) f = e.getJSONObject(e.length() - 2);
 			return String.valueOf((f.getInt("levelIndex")) + 1);
 		} catch (JSONException e) {
-			Log.e("currentLevel", String.valueOf(e));
+			Log.w("currentLevel", String.valueOf(e));
 		}
 		return context.getResources().getString(R.string.button_try_again_text);
 	}
@@ -105,10 +111,21 @@ public class GameJSON {
 		try {
 			JSONObject dummy = new JSONObject(loadJSONFromAsset(context, file));
 			dummy.put("levelIndex", level);
-			dummy.put("goldenTileCounter", MainActivity.goldenTilesNumber);
+			dummy.put("goldenTileCounter",
+					getTileTypeNumber() == 43 ?
+							getGoldenTilesNumber() - 2 :
+							getGoldenTilesNumber());
+			JSONArray layers = dummy.getJSONArray("layers");
+			JSONObject layer0 = layers.getJSONObject(0);
+			JSONArray stonesType0 = layer0.getJSONArray("stonesType");
+			stonesType0.put(0, getTileTypeNumber());
+			JSONObject layer1 = layers.getJSONObject(1);
+			JSONArray stonesType1 = layer1.getJSONArray("stonesType");
+			stonesType1.put(0, getTileTypeNumber());
+
 			FileTools.saveToFile(context, FileTools.mahjongClubFilesPath, "CurrentLevelStatus", dummy.toString().getBytes());
 		} catch (JSONException e) {
-			Log.e("currentLevelStatus", String.valueOf(e));
+			Log.w("currentLevelStatus", String.valueOf(e));
 		}
 	}
 
@@ -151,7 +168,7 @@ public class GameJSON {
 				data[11] = "0";
 			}
 		} catch (JSONException e) {
-			Log.e("playerInventory", String.valueOf(e));
+			Log.w("playerInventory", String.valueOf(e));
 		}
 		return data;
 	}
@@ -168,13 +185,25 @@ public class GameJSON {
 			data[3] = c.getString("booster_shuffle");
 			data[4] = c.getString("booster_thunder");
 		} catch (JSONException e) {
-			Log.e("playerInventory", String.valueOf(e));
+			Log.w("playerInventory", String.valueOf(e));
 		}
 		return data;
 	}
 
+	public static int getPlayerId(Context context) {
+		int id = 0;
+		try {
+			String a = loadExternalJSON(context, FileTools.mahjongClubFilesPath + "Data/", "player_credentials.gvmc");
+			JSONObject b = new JSONObject(a);
+			id = b.getInt("user_id");
+		} catch (JSONException e) {
+			Log.w("playerInventory", String.valueOf(e));
+		}
+		return id;
+	}
+
 	public static boolean copyRequestFile(Context context) {
-		byte[] file = FileTools.readByteFile(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "requests_queue.gvmc"));
+		byte[] file = FileTools.readByteFile(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Telegram/requests_queue.gvmc"));
 		if (file != null) {
 			FileTools.saveToFile(context, FileTools.mahjongClubFilesPath + "Requests/", "requests_queue.gvmc", file);
 			return true;

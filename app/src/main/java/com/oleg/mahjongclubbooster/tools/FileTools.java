@@ -1,4 +1,4 @@
-package com.oleg.mahjongclubbooster.util;
+package com.oleg.mahjongclubbooster.tools;
 
 import android.app.Activity;
 import android.content.Context;
@@ -129,11 +129,14 @@ public class FileTools {
                 if (df != null) {
                     InputStream is = context.getContentResolver().openInputStream(df.getUri());
                     if (is != null) {
+                        String out = "";
                         int size = is.available();
                         byte[] buffer = new byte[size];
-                        is.read(buffer);
+                        if (is.read(buffer) > 0) {
+                            out = new String(buffer, StandardCharsets.UTF_8);
+                        }
                         is.close();
-                        return new String(buffer, StandardCharsets.UTF_8);
+                        return out;
                     }
                 }
             } catch (IOException e) {
@@ -175,7 +178,7 @@ public class FileTools {
                     Log.e("readFile", e.toString());
                 }
             } else {
-                ToastUtils.shortCall(R.string.file_not_available);
+                ToastTools.shortCall(R.string.file_not_available);
             }
         } catch (Exception e) {
             Log.e("readFile", e.toString());
@@ -280,54 +283,4 @@ public class FileTools {
         }
         return list;
     }
-/*
-    public static void cleanDailyChallengeLevelsStatus() {
-        Uri pathUri = pathToUri(mahjongClubFilesPath + "DailyChallengeLevelsStatus/");
-        Log.d("Files", "getFileListByDocument: pathUri = "+pathUri);
-        DocumentFile documentFile = DocumentFile.fromTreeUri(App.get(), pathUri);
-        if (documentFile != null) {
-            DocumentFile[] documentFiles = documentFile.listFiles();
-            for (DocumentFile df : documentFiles) {
-                df.delete();
-            }
-        }
-    }
-
-    public static Boolean makeBackupFolder(Context context) {
-        File dir = new File (Objects.requireNonNull(context.getExternalFilesDir(null)).getAbsolutePath() + "/MahjongClubBackup");
-        if(!dir.exists()) {
-	        return dir.mkdirs();
-        }
-        return false;
-    }
-
-    public static String copyFile(Context context, String inputPath, String inputFile, String destPath) {
-        InputStream in = null;
-        OutputStream out = null;
-        String error = null;
-        Uri pathUri = pathToUri(inputPath);
-        DocumentFile inputDir = DocumentFile.fromTreeUri(context, pathUri);
-        pathUri = pathToUri(destPath);
-        DocumentFile destDir = DocumentFile.fromTreeUri(context, pathUri);
-
-        try {
-            DocumentFile newFile = inputDir.createFile("application/*", inputFile);
-            out = context.getContentResolver().openOutputStream(newFile.getUri());
-            in = context.getContentResolver().openInputStream(destDir.getUri());
-
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = in.read(buffer)) != -1) {
-                out.write(buffer, 0, read);
-            }
-            in.close();
-            // write the output file (You have now copied the file)
-            out.flush();
-            out.close();
-
-        } catch (Exception e) {
-            error = e.getMessage();
-        }
-        return error;
-    }*/
 }

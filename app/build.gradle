@@ -11,7 +11,7 @@ android {
         minSdk 24
         targetSdk 34
         versionCode 4
-        versionName "3"
+        versionName "4"
     }
 
     buildTypes {
@@ -31,9 +31,6 @@ android {
 }
 
 dependencies {
-    implementation libs.appupdater.app.updater
-    implementation libs.appupdater.app.dialog
-
     implementation libs.appcompat
     implementation libs.material
     implementation libs.activity

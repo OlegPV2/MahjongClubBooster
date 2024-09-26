@@ -1,4 +1,4 @@
-package com.oleg.mahjongclubbooster.util;
+package com.oleg.mahjongclubbooster.tools;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 
-public class ViewAnimationUtil {
+public class ViewAnimationTools {
 
 	private static ValueAnimator slideAnimator(View view, int start, int end) {
 

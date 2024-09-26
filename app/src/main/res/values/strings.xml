@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Mahjong Club Booster</string>
 
+    <string name="update_title">Доступно обновление</string>
+    <string name="update_positive_text">Обновить</string>
+
     <string name="event_start">Начало</string>
     <string name="event_end">Конец</string>
 
@@ -31,7 +34,7 @@
 
     <string name="autoclick_button_timer_text">Задержка автоклика кнопки</string>
     <string name="autoclick_button_timer_value_text">2500</string>
-    <string name="autoclick_point_timer_text">Задержка автоклика стрелки</string>
+    <string name="autoclick_point_timer_text">Задержка автоклика второй точки</string>
     <string name="autoclick_point_timer_value_text">2000</string>
     <string name="autuclick_timer_sec">мс</string>
 
@@ -61,6 +64,8 @@
 
     <string name="backup_folder_exist">Path %1$s exist</string>
     <string name="backup_folder_make">Make dir: %1$s</string>
+
+    <string name="tile_type">Тип плиток на уровне</string>
 
     <string name="button_off">Выключить\nкнопку</string>
     <string name="button_on">Включить\nкнопку</string>
