@@ -1,0 +1,8 @@
+{
+  "url":"https://github.com/OlegPV2/MahjongClubBooster/releases/latest/download/",
+  "fileName":"MahjongClubBooster.apk",
+  "versionCode":5,
+"_comment":"do not forget to change versionCode in build.gradle before generating apk",
+  "cancellable":true,
+  "updateMessage":"Version 4\n-----------\n1. Total code refurbishing\n2. Added second point for autoclicker\n3. Choose tile type for the generating next level\n/4. New method for several users"
+}
