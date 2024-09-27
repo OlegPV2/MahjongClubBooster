@@ -1,5 +1,7 @@
 package com.oleg.mahjongclubbooster.shizukuutil;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -23,7 +25,7 @@ public class Exec {
             process = (ShizukuRemoteProcess) method.invoke(null, e, cmd, env);
 
         } catch (Exception err) {
-            err.printStackTrace();
+            Log.e("ShizukuRemoteProcess_newProcess", err.toString());
         }
         return process;
     }
@@ -55,7 +57,7 @@ public class Exec {
                     BufferedReader mReader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
                     String inline;
                     while ((inline = mReader.readLine()) != null) {
-                        String str = "";
+                        String str;
                         if (inline.isEmpty())
                             str = null;
                         else {

@@ -207,7 +207,7 @@ public class FloatingView extends FrameLayout implements View.OnClickListener {
 					point.setFocusable(false);
 					Set<String> storedPosition = SharedPreferencesTools.getProperties(SharedPreferencesTools.APP_PREFERENCES_POINT_COORDINATES);
 					int[] location = new int[2];
-					if (storedPosition == null) {
+					if (storedPosition.size() < 2) {
 						location[0] = 100;
 						location[1] = 100;
 					} else {

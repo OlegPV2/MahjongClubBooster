@@ -133,7 +133,7 @@ public abstract class MainActivityViewInit extends AppCompatActivity {
 		String tiles = "";
 		if (inventory[4] != null) tiles = String.valueOf(Integer.parseInt(inventory[4]) * 2);
 		thunder.setText(getString(R.string.inventory_thunder_and_tiles, inventory[4], tiles));
-		EditText autoClickButtonTimer = findViewById(R.id.autoclick_button_timer);
+		EditText autoClickButtonTimer = findViewById(R.id.auto_click_button_timer);
 		String value = SharedPreferencesTools.getProperty(SharedPreferencesTools.APP_PREFERENCES_BUTTON_INTERVAL);
 		if (value != null) {
 			autoClickButtonTimer.setText(value);
@@ -156,7 +156,7 @@ public abstract class MainActivityViewInit extends AppCompatActivity {
 			public void afterTextChanged(Editable editable) {
 			}
 		});
-		EditText autoClickPointTimer = findViewById(R.id.autoclick_point_timer);
+		EditText autoClickPointTimer = findViewById(R.id.auto_click_point_timer);
 		value = SharedPreferencesTools.getProperty(SharedPreferencesTools.APP_PREFERENCES_POINT_INTERVAL);
 		if (value != null) {
 			autoClickPointTimer.setText(value);
@@ -229,7 +229,9 @@ public abstract class MainActivityViewInit extends AppCompatActivity {
 		changeStatusPopUp = new PopupWindow(this);
 		changeStatusPopUp.setContentView(layout);
 		changeStatusPopUp.setWidth(LinearLayout.LayoutParams.WRAP_CONTENT);
-		changeStatusPopUp.setHeight(LinearLayout.LayoutParams.WRAP_CONTENT);
+		int spec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+		layout.measure(spec, spec);
+		changeStatusPopUp.setHeight(layout.getMeasuredHeight());
 		changeStatusPopUp.setFocusable(true);
 
 		changeStatusPopUp.showAsDropDown(view);

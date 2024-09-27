@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/layout_events"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin"
+        android:background="@drawable/shape"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/events_header"
+            android:textSize="@dimen/text_header"
+            android:textColor="@color/black" />
+
+        <LinearLayout
+            android:id="@+id/layout_events_collapsable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/butterfly_header"
+                    android:textSize="@dimen/text_main"
+                    android:textColor="@color/black" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="@dimen/padding_space"
+                        android:paddingEnd="@dimen/padding_space"
+                        android:text="@string/event_start"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                    <TextView
+                        android:id="@+id/butterfly_start_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:paddingStart="@dimen/padding_space"
+                        android:paddingEnd="@dimen/padding_space"
+                        android:text="@string/event_end"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                    <TextView
+                        android:id="@+id/butterfly_end_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/chest_header"
+                    android:textSize="@dimen/text_main"
+                    android:textColor="@color/black" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="@dimen/padding_space"
+                        android:paddingEnd="@dimen/padding_space"
+                        android:text="@string/event_start"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                    <TextView
+                        android:id="@+id/chest_start_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:paddingStart="@dimen/padding_space"
+                        android:paddingEnd="@dimen/padding_space"
+                        android:text="@string/event_end"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                    <TextView
+                        android:id="@+id/chest_end_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/tournament_header"
+                    android:textSize="@dimen/text_main"
+                    android:textColor="@color/black" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="@dimen/padding_space"
+                        android:paddingEnd="@dimen/padding_space"
+                        android:text="@string/event_start"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                    <TextView
+                        android:id="@+id/tournament_start_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:paddingStart="@dimen/padding_space"
+                        android:paddingEnd="@dimen/padding_space"
+                        android:text="@string/event_end"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                    <TextView
+                        android:id="@+id/tournament_end_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/puzzle_header"
+                    android:textSize="@dimen/text_main"
+                    android:textColor="@color/black" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="@dimen/padding_space"
+                        android:paddingEnd="@dimen/padding_space"
+                        android:text="@string/event_start"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                    <TextView
+                        android:id="@+id/puzzle_start_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:paddingStart="@dimen/padding_space"
+                        android:paddingEnd="@dimen/padding_space"
+                        android:text="@string/event_end"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                    <TextView
+                        android:id="@+id/puzzle_end_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:paddingStart="@dimen/padding_space"
+                        android:paddingEnd="@dimen/padding_space"
+                        android:text="@string/number_of_tiles"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                    <TextView
+                        android:id="@+id/puzzle_number_of_the_tiles"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/zen_header"
+                    android:textSize="@dimen/text_main"
+                    android:textColor="@color/black" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:textColor="@color/black">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="@dimen/padding_space"
+                        android:paddingEnd="@dimen/padding_space"
+                        android:text="@string/event_start"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                    <TextView
+                        android:id="@+id/zen_start_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:paddingStart="@dimen/padding_space"
+                        android:paddingEnd="@dimen/padding_space"
+                        android:text="@string/event_end"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                    <TextView
+                        android:id="@+id/zen_end_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:paddingStart="@dimen/padding_space"
+                        android:paddingEnd="@dimen/padding_space"
+                        android:text="@string/number_of_levels"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+
+                    <TextView
+                        android:id="@+id/zen_number_of_the_levels"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_sub" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>

@@ -81,19 +81,30 @@ public class CheckUpdate {
         final String CHANNEL_2_ID = "channel2";
         int processId = 2;
         Intent activityIntent = new Intent(mainActivity, MainActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(mainActivity, 0, activityIntent, PendingIntent.FLAG_IMMUTABLE);
+
+        PendingIntent contentIntent = PendingIntent.getActivity(
+                mainActivity,
+                0,
+                activityIntent,
+                PendingIntent.FLAG_IMMUTABLE);
+
         final NotificationCompat.Builder notification = new NotificationCompat.Builder(mainActivity, CHANNEL_2_ID)
                 .setSmallIcon(R.drawable.ic_stat_name)
-                .setContentTitle("Download")
+                .setContentTitle(mainActivity.getResources().getString(R.string.update_download))
                 .setOnlyAlertOnce(true)
                 .setOngoing(true)
-                .setContentText("Downloading in process")
+                .setContentText(mainActivity.getResources().getString(R.string.update_download_in_process))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(contentIntent);
+
         NotificationManager notificationManager = (NotificationManager) mainActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_2_ID, "Download", NotificationManager.IMPORTANCE_HIGH);
-            notificationChannel.setDescription("Downloading in process");
+            NotificationChannel notificationChannel = new NotificationChannel(
+                    CHANNEL_2_ID,
+                    mainActivity.getResources().getString(R.string.update_download),
+                    NotificationManager.IMPORTANCE_HIGH);
+            notificationChannel.setDescription(mainActivity.getResources().getString(R.string.update_download_in_process));
             notificationManager.createNotificationChannel(notificationChannel);
         }
 
@@ -117,7 +128,7 @@ public class CheckUpdate {
             }
         };
         new AlertDialog.Builder(mainActivity)
-                .setTitle(R.string.update_title)
+                .setTitle(R.string.update_available)
                 .setCancelable(!updateModel.cancellable)
                 .setMessage(updateModel.updateMessage)
                 .setPositiveButton(R.string.update_positive_text, (dialog, which) -> appUpdater.execute())

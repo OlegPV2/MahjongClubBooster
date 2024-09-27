@@ -84,7 +84,6 @@ public class TapAccessibilityService extends AccessibilityService {
 		GestureDescription.Builder gBuilder = new GestureDescription.Builder();
 		gBuilder.addStroke(new GestureDescription.StrokeDescription(swipePath, 0, 1));
 		String finalLevel = level;
-//		if (nextTap == 1) buttonOverlayService.hideAim();
 		dispatchGesture(gBuilder.build(), new GestureResultCallback() {
 			@Override
 			public void onCompleted(GestureDescription gestureDescription) {
@@ -109,7 +108,6 @@ public class TapAccessibilityService extends AccessibilityService {
 				super.onCancelled(gestureDescription);
 			}
 		}, null);
-//		if (nextTap == 1) buttonOverlayService.showAim();
 	}
 
 	private myRunnable myRunnable;

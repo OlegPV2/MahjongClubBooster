@@ -29,6 +29,25 @@ public class ButtonOverlayService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			String CHANNEL_1_ID = "channel1";
+			NotificationChannel channel = new NotificationChannel(CHANNEL_1_ID,
+					"Overlay notification",
+					NotificationManager.IMPORTANCE_LOW);
+
+			((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
+					.createNotificationChannel(channel);
+
+			Notification notification = new NotificationCompat.Builder(this, CHANNEL_1_ID)
+					.setContentTitle("Mahjong Club Booster")
+					.setContentText("Foreground process")
+					.setSmallIcon(R.drawable.ic_stat_name)
+					.build();
+
+			startForeground(1, notification);
+		}
+
 		floatingView = new FloatingView(this);
 		HandlerThread handlerThread = new HandlerThread("level-handler");
 		handlerThread.start();
@@ -56,23 +75,6 @@ public class ButtonOverlayService extends Service {
 
 		floatingView.show(location[0], location[1], false);
 
-		if (Build.VERSION.SDK_INT >= 26) {
-			String CHANNEL_1_ID = "channel1";
-			NotificationChannel channel = new NotificationChannel(CHANNEL_1_ID,
-					"Overlay notification",
-					NotificationManager.IMPORTANCE_LOW);
-
-			((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
-					.createNotificationChannel(channel);
-
-			Notification notification = new NotificationCompat.Builder(this, CHANNEL_1_ID)
-					.setContentTitle("Mahjong Club Booster")
-					.setContentText("Foreground process")
-					.setSmallIcon(R.drawable.ic_stat_name)
-					.build();
-
-			startForeground(1, notification);
-		}
 		serviceRun = true;
 		return super.onStartCommand(intent, flags, startId);
 	}
